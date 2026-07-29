@@ -181,9 +181,9 @@
         }
 
         .sync-status {
-            margin: 12px 0;
-            color: #64748b;
-            font-size: 12px;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 600;
             text-align: right;
         }
 
@@ -193,6 +193,10 @@
             justify-content: flex-end;
             gap: 10px;
             margin: 12px 0;
+            padding: 10px 12px;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            background: #eff6ff;
         }
 
         .sync-bar .sync-status {
@@ -214,6 +218,17 @@
             cursor: wait;
             opacity: 0.6;
         }
+
+        @media (max-width: 600px) {
+            .sync-bar {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .sync-bar .sync-status {
+                text-align: left;
+            }
+        }
     </style>
 </head>
 <body>
@@ -233,7 +248,7 @@
         <button class="nav-btn" onclick="changeMonth(1)">Next &gt;</button>
     </div>
     <div class="sync-bar">
-        <span id="syncStatus" class="sync-status">Loading the latest TeamSnap schedule…</span>
+        <span id="syncStatus" class="sync-status">🕒 Loading the latest TeamSnap schedule…</span>
         <button id="syncButton" class="sync-btn" type="button" onclick="refreshSchedule()">
             ↻ Refresh
         </button>
@@ -478,7 +493,7 @@ END:VCALENDAR`;
     // Initialize Calendar for August 2026
     renderCalendar(currentYear, currentMonth);
 </script>
-<script src="app.js"></script>
+<script src="app.js?v=20260728-2"></script>
 
 </body>
 </html>

@@ -172,7 +172,7 @@ async function loadSchedule() {
         if (!events.length) throw new Error('No events found');
         const metadata = await metadataResponse.json();
         status.textContent =
-            `${events.length} events · Last TeamSnap sync: ${formatSyncedAt(metadata.syncedAt)}`;
+            `🕒 Last TeamSnap sync: ${formatSyncedAt(metadata.syncedAt)} · ${events.length} events`;
     } catch (error) {
         status.textContent =
             'The latest TeamSnap schedule could not be loaded. Please try again shortly.';
