@@ -179,6 +179,13 @@
             height: 14px;
             border-radius: 3px;
         }
+
+        .sync-status {
+            margin: 12px 0;
+            color: #64748b;
+            font-size: 12px;
+            text-align: right;
+        }
     </style>
 </head>
 <body>
@@ -197,6 +204,7 @@
         <h2 id="monthYear">August 2026</h2>
         <button class="nav-btn" onclick="changeMonth(1)">Next &gt;</button>
     </div>
+    <div id="syncStatus" class="sync-status">Loading the latest TeamSnap schedule…</div>
 
     <table class="calendar">
         <thead>
@@ -227,7 +235,7 @@
     </div>
 </div>
 
-<script>
+<script type="text/plain" id="legacy-calendar">
     // 16U Season Fixed Event Data
     const events = [
         // Training Camp
@@ -437,6 +445,7 @@ END:VCALENDAR`;
     // Initialize Calendar for August 2026
     renderCalendar(currentYear, currentMonth);
 </script>
+<script src="app.js"></script>
 
 </body>
 </html>
