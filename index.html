@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>16U Hockey Practice Schedule</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #3b82f6;
+            --accent: #f59e0b;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            color: white;
+            padding: 20px 24px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .btn-import {
+            background-color: var(--accent);
+            color: #0f172a;
+            border: none;
+            padding: 10px 18px;
+            font-size: 14px;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-import:hover {
+            background-color: #d97706;
+            transform: translateY(-1px);
+        }
+
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin-bottom: 16px;
+        }
+
+        .nav-bar h2 {
+            margin: 0;
+            font-size: 20px;
+            color: var(--primary);
+            width: 200px;
+            text-align: center;
+        }
+
+        .nav-btn {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: #e2e8f0;
+        }
+
+        .calendar {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .calendar th {
+            background-color: var(--primary);
+            color: white;
+            padding: 12px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .calendar th.sun { color: #fca5a5; }
+        .calendar th.sat { color: #93c5fd; }
+
+        .calendar td {
+            border: 1px solid var(--border);
+            height: 110px;
+            vertical-align: top;
+            padding: 8px;
+            background-color: #fff;
+        }
+
+        .calendar .other-month {
+            background-color: #f8fafc;
+            color: #cbd5e0;
+        }
+
+        .date-num {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 6px;
+            color: #334155;
+        }
+
+        .other-month .date-num {
+            color: #cbd5e0;
+        }
+
+        .event {
+            font-size: 11px;
+            padding: 4px 6px;
+            margin-bottom: 4px;
+            border-radius: 4px;
+            line-height: 1.3;
+        }
+
+        .camp { background-color: #fef3c7; border-left: 3px solid #d97706; color: #78350f; }
+        .u16 { background-color: #dbeafe; border-left: 3px solid #2563eb; color: #1e40af; }
+        
+        .event-time { font-weight: bold; }
+        .event-loc { font-size: 10px; opacity: 0.85; }
+
+        .legend {
+            display: flex;
+            gap: 16px;
+            margin-top: 16px;
+            font-size: 13px;
+            color: #475569;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-box {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div>
+            <h1>🏒 16U Hockey Practice Schedule</h1>
+            <span style="font-size: 13px; opacity: 0.9;">2026 – 2027 Season Calendar</span>
+        </div>
+        <button class="btn-import" onclick="downloadICS()">📅 Export to Google Calendar</button>
+    </div>
+
+    <div class="nav-bar">
+        <button class="nav-btn" onclick="changeMonth(-1)">&lt; Prev</button>
+        <h2 id="monthYear">August 2026</h2>
+        <button class="nav-btn" onclick="changeMonth(1)">Next &gt;</button>
+    </div>
+
+    <table class="calendar">
+        <thead>
+            <tr>
+                <th class="sun">SUN</th>
+                <th>MON</th>
+                <th>TUE</th>
+                <th>WED</th>
+                <th>THU</th>
+                <th>FRI</th>
+                <th class="sat">SAT</th>
+            </tr>
+        </thead>
+        <tbody id="calendarBody">
+            <!-- Calendar Grid JS Generated -->
+        </tbody>
+    </table>
+
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-box" style="background: #fef3c7; border-left: 3px solid #d97706;"></div>
+            <span>Training Camp</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-box" style="background: #dbeafe; border-left: 3px solid #2563eb;"></div>
+            <span>16U Regular Practice & Video / Off-Ice</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 16U Season Fixed Event Data
+    const events = [
+        // Training Camp
+        { date: '2026-08-13', title: '16u-Training Camp', time: '9:00 PM - 10:30 PM', loc: 'Ice Chalet', type: 'camp' },
+        { date: '2026-08-16', title: '16u-Training Camp', time: '5:45 PM - 7:45 PM', loc: 'Ice Chalet', type: 'camp' },
+    ];
+
+    // Helper: Add recurring events
+    function addRecurringEvents(startDateStr, endDateStr, daysOfWeek, title, time, loc, type) {
+        let current = new Date(startDateStr);
+        const end = new Date(endDateStr);
+        
+        while (current <= end) {
+            if (daysOfWeek.includes(current.getDay())) {
+                const year = current.getFullYear();
+                const month = String(current.getMonth() + 1).padStart(2, '0');
+                const day = String(current.getDate()).padStart(2, '0');
+                events.push({
+                    date: `${year}-${month}-${day}`,
+                    title: title,
+                    time: time,
+                    loc: loc,
+                    type: type
+                });
+            }
+            current.setDate(current.getDate() + 1);
+        }
+    }
+
+    // August – September Schedule
+    addRecurringEvents('2026-08-17', '2026-09-30', [1], '16u-Practice & Video', '8:00 PM (Vid) / 9:00 PM (Ice)', 'Cool Sports', 'u16');
+    addRecurringEvents('2026-08-17', '2026-09-30', [3], '16u-Practice & Video', '7:30 PM (Vid) / 8:40 PM (Ice)', 'Cool Sports', 'u16');
+    addRecurringEvents('2026-08-17', '2026-09-30', [4], '16u-Practice & Off-Ice', '7:45 PM (Off) / 9:00 PM (Ice)', 'Ice Chalet', 'u16');
+
+    // October Schedule (Mondays)
+    addRecurringEvents('2026-10-01', '2026-10-31', [1], '16u-Practice & Video', '6:00 PM (Ice) / 8:00 PM (Vid)', 'Civic Coliseum', 'u16');
+
+    // October – March Schedule (Wed, Thu)
+    addRecurringEvents('2026-10-01', '2027-03-31', [3], '16u-Practice & Video', '8:00 PM (Vid) / 9:00 PM (Ice)', 'Cool Sports', 'u16');
+    addRecurringEvents('2026-10-01', '2027-03-31', [4], '16u-Practice & Off-Ice', '7:00 PM (Ice) / 8:00 PM (Off)', 'Civic Coliseum', 'u16');
+
+    // November – March Schedule (Tuesdays)
+    addRecurringEvents('2026-11-01', '2027-03-31', [2], '16u-Practice & Video', '6:00 PM (Ice) / 8:00 PM (Vid)', 'Civic Coliseum', 'u16');
+
+    let currentYear = 2026;
+    let currentMonth = 7; // August (0-indexed: 7)
+
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+    function renderCalendar(year, month) {
+        document.getElementById('monthYear').innerText = `${monthNames[month]} ${year}`;
+        const calendarBody = document.getElementById('calendarBody');
+        calendarBody.innerHTML = '';
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const prevDaysInMonth = new Date(year, month, 0).getDate();
+
+        let date = 1;
+        let nextDate = 1;
+
+        for (let i = 0; i < 6; i++) {
+            let row = document.createElement('tr');
+            let hasDateInRow = false;
+
+            for (let j = 0; j < 7; j++) {
+                let cell = document.createElement('td');
+                let cellDateStr = '';
+
+                if (i === 0 && j < firstDay) {
+                    // Previous Month Days
+                    let prevDay = prevDaysInMonth - firstDay + j + 1;
+                    cell.classList.add('other-month');
+                    cell.innerHTML = `<div class="date-num">${prevDay}</div>`;
+                } else if (date > daysInMonth) {
+                    // Next Month Days
+                    cell.classList.add('other-month');
+                    cell.innerHTML = `<div class="date-num">${nextDate++}</div>`;
+                } else {
+                    // Current Month Days
+                    hasDateInRow = true;
+                    const formattedMonth = String(month + 1).padStart(2, '0');
+                    const formattedDay = String(date).padStart(2, '0');
+                    cellDateStr = `${year}-${formattedMonth}-${formattedDay}`;
+
+                    let cellContent = `<div class="date-num">${date}</div>`;
+                    
+                    // Add Events
+                    const dayEvents = events.filter(e => e.date === cellDateStr);
+                    dayEvents.forEach(ev => {
+                        cellContent += `
+                            <div class="event ${ev.type}">
+                                <div class="event-time">${ev.time}</div>
+                                <b>${ev.title}</b>
+                                <div class="event-loc">@ ${ev.loc}</div>
+                            </div>
+                        `;
+                    });
+
+                    cell.innerHTML = cellContent;
+                    date++;
+                }
+                row.appendChild(cell);
+            }
+            if (hasDateInRow || i < 5) {
+                calendarBody.appendChild(row);
+            }
+        }
+    }
+
+    function changeMonth(delta) {
+        currentMonth += delta;
+        if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        } else if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        }
+        renderCalendar(currentYear, currentMonth);
+    }
+
+    function downloadICS() {
+        const icsData = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//16U Hockey Schedule//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+SUMMARY:16u-Training Camp: On-Ice
+DTSTART:20260813T210000
+DTEND:20260813T223000
+LOCATION:Ice Chalet
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:16u-Training Camp: On-Ice
+DTSTART:20260816T174500
+DTEND:20260816T194500
+LOCATION:Ice Chalet
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:16u-Practice & Video (Mon)
+DTSTART:20260817T200000
+DTEND:20260817T220000
+RRULE:FREQ=WEEKLY;UNTIL=20260930T235959Z;BYDAY=MO
+LOCATION:Cool Sports
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:16u-Practice & Video (Wed)
+DTSTART:20260819T193000
+DTEND:20260819T221000
+RRULE:FREQ=WEEKLY;UNTIL=20260930T235959Z;BYDAY=WE
+LOCATION:Cool Sports
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:16u-Practice & Off-Ice (Thu)
+DTSTART:20260820T194500
+DTEND:20260820T223000
+RRULE:FREQ=WEEKLY;UNTIL=20260930T235959Z;BYDAY=TH
+LOCATION:Ice Chalet
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:16u-Practice & Video (Mon)
+DTSTART:20261005T180000
+DTEND:20261005T210000
+RRULE:FREQ=WEEKLY;UNTIL=20261031T235959Z;BYDAY=MO
+LOCATION:Knoxville Civic Coliseum
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:16u-Practice & Video (Wed)
+DTSTART:20261007T200000
+DTEND:20261007T220000
+RRULE:FREQ=WEEKLY;UNTIL=20270331T235959Z;BYDAY=WE
+LOCATION:Cool Sports
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:16u-Practice & Off-Ice (Thu)
+DTSTART:20261001T190000
+DTEND:20261001T210000
+RRULE:FREQ=WEEKLY;UNTIL=20270331T235959Z;BYDAY=TH
+LOCATION:Knoxville Civic Coliseum
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:16u-Practice & Video (Tue)
+DTSTART:20261103T180000
+DTEND:20261103T210000
+RRULE:FREQ=WEEKLY;UNTIL=20270331T235959Z;BYDAY=TU
+LOCATION:Knoxville Civic Coliseum
+END:VEVENT
+END:VCALENDAR`;
+
+        const blob = new Blob([icsData], { type: 'text/calendar;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.setAttribute('download', '16U_Hockey_Schedule.ics');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        setTimeout(() => {
+            if (confirm("The 16U_Hockey_Schedule.ics file has been downloaded.\n\nWould you like to open Google Calendar Import settings now?")) {
+                window.open("https://calendar.google.com/calendar/u/0/r/settings/export", "_blank");
+            }
+        }, 500);
+    }
+
+    // Initialize Calendar for August 2026
+    renderCalendar(currentYear, currentMonth);
+</script>
+
+</body>
+</html>
