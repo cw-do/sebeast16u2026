@@ -23,12 +23,12 @@ jobs:
 
       - name: Commit calendar changes
         run: |
-          if [ -z "$(git status --porcelain -- calendar.ics)" ]; then
+          if [ -z "$(git status --porcelain -- calendar.ics calendar-meta.json)" ]; then
             echo "Calendar is already current."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add calendar.ics
+          git add calendar.ics calendar-meta.json
           git commit -m "Update TeamSnap calendar"
           git push

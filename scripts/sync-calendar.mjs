@@ -12,4 +12,9 @@ if (!calendar.includes('BEGIN:VCALENDAR') || !calendar.includes('BEGIN:VEVENT'))
 }
 
 await writeFile(new URL('../calendar.ics', import.meta.url), calendar, 'utf8');
+await writeFile(
+    new URL('../calendar-meta.json', import.meta.url),
+    `${JSON.stringify({ syncedAt: new Date().toISOString() }, null, 2)}\n`,
+    'utf8'
+);
 console.log(`Saved calendar.ics (${calendar.length} characters)`);

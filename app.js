@@ -141,21 +141,52 @@ function downloadICS() {
     window.location.href = TEAMSNAP_ICAL_URL;
 }
 
+function formatSyncedAt(value) {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return 'Sync time unavailable';
+    return new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/New_York',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        timeZoneName: 'short'
+    }).format(date);
+}
+
 async function loadSchedule() {
     const status = document.getElementById('syncStatus');
+    const button = document.getElementById('syncButton');
+    button.disabled = true;
+    button.textContent = 'Refreshing…';
     try {
-        const response = await fetch(`calendar.ics?v=${Date.now()}`, { cache: 'no-store' });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        events = parseIcal(await response.text());
+        const cacheBuster = Date.now();
+        const [calendarResponse, metadataResponse] = await Promise.all([
+            fetch(`calendar.ics?v=${cacheBuster}`, { cache: 'no-store' }),
+            fetch(`calendar-meta.json?v=${cacheBuster}`, { cache: 'no-store' })
+        ]);
+        if (!calendarResponse.ok) throw new Error(`Calendar HTTP ${calendarResponse.status}`);
+        if (!metadataResponse.ok) throw new Error(`Metadata HTTP ${metadataResponse.status}`);
+        events = parseIcal(await calendarResponse.text());
         if (!events.length) throw new Error('No events found');
+        const metadata = await metadataResponse.json();
         status.textContent =
-            `${events.length} TeamSnap events · Automatically refreshed every 4 hours`;
+            `${events.length} events · Last TeamSnap sync: ${formatSyncedAt(metadata.syncedAt)}`;
     } catch (error) {
         status.textContent =
             'The latest TeamSnap schedule could not be loaded. Please try again shortly.';
         console.error('Calendar load failed:', error);
+    } finally {
+        button.disabled = false;
+        button.textContent = '↻ Refresh';
     }
     renderCalendar(currentYear, currentMonth);
+}
+
+function refreshSchedule() {
+    document.getElementById('syncStatus').textContent = 'Checking for the latest synced schedule…';
+    loadSchedule();
 }
 
 loadSchedule();

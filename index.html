@@ -186,6 +186,34 @@
             font-size: 12px;
             text-align: right;
         }
+
+        .sync-bar {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            margin: 12px 0;
+        }
+
+        .sync-bar .sync-status {
+            margin: 0;
+        }
+
+        .sync-btn {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: white;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 7px 10px;
+        }
+
+        .sync-btn:disabled {
+            cursor: wait;
+            opacity: 0.6;
+        }
     </style>
 </head>
 <body>
@@ -204,7 +232,12 @@
         <h2 id="monthYear">August 2026</h2>
         <button class="nav-btn" onclick="changeMonth(1)">Next &gt;</button>
     </div>
-    <div id="syncStatus" class="sync-status">Loading the latest TeamSnap schedule…</div>
+    <div class="sync-bar">
+        <span id="syncStatus" class="sync-status">Loading the latest TeamSnap schedule…</span>
+        <button id="syncButton" class="sync-btn" type="button" onclick="refreshSchedule()">
+            ↻ Refresh
+        </button>
+    </div>
 
     <table class="calendar">
         <thead>
