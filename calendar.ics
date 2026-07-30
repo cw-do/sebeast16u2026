@@ -7,7 +7,7 @@ X-WR-CALNAME:Southeast Beast 16u
 X-WR-CALDESC:The event schedule for the Southeast Beast 16u Ice Hockey team
 X-WR-TIMEZONE:America/New_York
 X-PUBLISHED-TTL:PT1H
-X-TS-TIMESTAMP:2026-07-30 17:06:08
+X-TS-TIMESTAMP:2026-07-30 19:06:16
 BEGIN:VTIMEZONE
 TZID:America/New_York
 BEGIN:DAYLIGHT
@@ -134,17 +134,14 @@ SEQUENCE:0
 SUMMARY:Southeast Beast 16u at Jr. Carolina Hurricanes 16u AAA
 END:VEVENT
 BEGIN:VEVENT
-DTSTAMP:20260605T133339
+DTSTAMP:20260730T143204
 UID:10201455-368898481
 DTSTART:20261017T000000
 DTEND:20261018T000000
-DESCRIPTION:https://nat1hl.com/events/t1er-events/\n\nLast year's info:\nT1
- ER West NAHL Experience\nT1ER 16U\nLevel	Anticipated Start	Anticipated End
- \nT1ER 16U WEST	10/17 - 8:00am	10/19 - 6:15pm \n\nI expect the same for us
- .  It is posted as a Friday to Sunday schedule\nThis IS a stay-to-play tou
- rnament. -   (Arrival Time: 11:00 AM (Eastern Time (US & Canada))) 
-LAST-MODIFIED:20260605T133339
-LOCATION:Janesville\, WI
+DESCRIPTION:CCM Motown\n200x85.com/ccm-motown/\n\nthis is a stay to play. -
+    (Arrival Time: 12:00 AM (EDT)) 
+LAST-MODIFIED:20260730T143204
+LOCATION:Detroit
 SEQUENCE:0
 SUMMARY:Southeast Beast 16u vs TBD
 END:VEVENT
@@ -224,19 +221,15 @@ SEQUENCE:0
 SUMMARY:Southeast Beast 16u vs TBD
 END:VEVENT
 BEGIN:VEVENT
-DTSTAMP:20260605T140738
+DTSTAMP:20260730T143419
 UID:10201455-368899746
 DTSTART:20270130T000000
 DTEND:20270131T000000
-DESCRIPTION:Location: city TBD\n https://www.floridaexposurecup.com/en/page
- /details.html\n\nThis is a THURSDAY through Sunday tournament.\nLOCATIONS:
-  Fort Lauderdale\, FL\, West Palm Beach\, FL\, Clearwater\, FL - these wil
- l be divided up by age closer to the tournament\nThis IS a stay-to-play ev
- ent -   (Arrival Time: 12:00 PM (Eastern Time (US & Canada))) 
-LAST-MODIFIED:20260605T140738
-LOCATION:Florida
+DESCRIPTION:UT1HL tournament -   (Arrival Time: 12:00 AM (EST)) 
+LAST-MODIFIED:20260730T143419
+LOCATION:Boston MA
 SEQUENCE:0
-SUMMARY:Southeast Beast 16u vs TBD
+SUMMARY:Southeast Beast 16u at TBD
 END:VEVENT
 BEGIN:VEVENT
 DTSTAMP:20260605T140855
@@ -772,54 +765,6 @@ LAST-MODIFIED:20260728T202038
 LOCATION:100 Lebanon St. Knoxville
 SEQUENCE:0
 SUMMARY:Southeast Beast 16u - Team Practice
-END:VEVENT
-BEGIN:VEVENT
-DTSTAMP:20260728T202329
-UID:10201455-370703186
-DTSTART;TZID=America/New_York:20260907T200000
-DTEND;TZID=America/New_York:20260907T210000
-DESCRIPTION:Location: KCAC Parking lot C\n   (Arrival Time:  8:00 PM (Easte
- rn Time (US & Canada))) 
-LAST-MODIFIED:20260728T202329
-LOCATION:500 Howard Baker Jr Blvd\, Knoxville\, TN 37915
-SEQUENCE:0
-SUMMARY:Southeast Beast 16u - Video Review
-END:VEVENT
-BEGIN:VEVENT
-DTSTAMP:20260728T202329
-UID:10201455-370703187
-DTSTART;TZID=America/New_York:20260914T200000
-DTEND;TZID=America/New_York:20260914T210000
-DESCRIPTION:Location: KCAC Parking lot C\n   (Arrival Time:  8:00 PM (Easte
- rn Time (US & Canada))) 
-LAST-MODIFIED:20260728T202329
-LOCATION:500 Howard Baker Jr Blvd\, Knoxville\, TN 37915
-SEQUENCE:0
-SUMMARY:Southeast Beast 16u - Video Review
-END:VEVENT
-BEGIN:VEVENT
-DTSTAMP:20260728T202329
-UID:10201455-370703188
-DTSTART;TZID=America/New_York:20260921T200000
-DTEND;TZID=America/New_York:20260921T210000
-DESCRIPTION:Location: KCAC Parking lot C\n   (Arrival Time:  8:00 PM (Easte
- rn Time (US & Canada))) 
-LAST-MODIFIED:20260728T202329
-LOCATION:500 Howard Baker Jr Blvd\, Knoxville\, TN 37915
-SEQUENCE:0
-SUMMARY:Southeast Beast 16u - Video Review
-END:VEVENT
-BEGIN:VEVENT
-DTSTAMP:20260728T202329
-UID:10201455-370703189
-DTSTART;TZID=America/New_York:20260928T200000
-DTEND;TZID=America/New_York:20260928T210000
-DESCRIPTION:Location: KCAC Parking lot C\n   (Arrival Time:  8:00 PM (Easte
- rn Time (US & Canada))) 
-LAST-MODIFIED:20260728T202329
-LOCATION:500 Howard Baker Jr Blvd\, Knoxville\, TN 37915
-SEQUENCE:0
-SUMMARY:Southeast Beast 16u - Video Review
 END:VEVENT
 BEGIN:VEVENT
 DTSTAMP:20260728T202330
