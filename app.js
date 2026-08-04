@@ -40,6 +40,86 @@ function formatTime(value) {
     return `${hour}:${String(value.minute).padStart(2, '0')} ${value.hour < 12 ? 'AM' : 'PM'}`;
 }
 
+const TOURNAMENT_DETAILS = {
+    '2026-09-12': {
+        label: 'Jackson Weis Memorial / OVC',
+        url: 'https://tamohockey.com/jackson-weis-memorial%2Fovc',
+        note: 'Tournament weekend in the Toledo/Sylvania area.'
+    },
+    '2026-09-19': {
+        label: 'Chicago Icebreaker',
+        url: 'https://superserieshockey.com/events/chicago-icebreaker/',
+        note: 'SuperSeries tournament weekend in the Chicago area.'
+    },
+    '2026-10-17': {
+        label: 'CCM Motown',
+        url: 'http://200x85.com/ccm-motown/',
+        note: '200x85 CCM Motown tournament weekend in Detroit.'
+    },
+    '2026-11-14': {
+        label: 'UT1HL Futures Showcase',
+        url: 'https://unitedtier1hockeyleague.com/futures-showcase-2/',
+        note: 'United Tier 1 Hockey League showcase weekend in Massachusetts.'
+    },
+    '2026-12-12': {
+        label: 'Gold Puck AAA',
+        url: 'https://waterloominorhockey.com/Tournaments/6456/Gold_Puck_AAA_Tournament/',
+        note: 'Gold Puck AAA Tournament in Waterloo, Ontario.'
+    },
+    '2026-12-19': {
+        label: 'UT1HL',
+        url: 'https://unitedtier1hockeyleague.com/missouri/',
+        note: 'United Tier 1 Hockey League weekend in Missouri.'
+    },
+    '2027-01-09': {
+        label: 'UT1HL',
+        url: 'https://unitedtier1hockeyleague.com/missouri/',
+        note: 'United Tier 1 Hockey League weekend.'
+    },
+    '2027-01-16': {
+        label: 'NAT1HL',
+        url: 'https://nat1hl.com/',
+        note: 'NAT1HL tournament weekend in the Detroit/Troy area.'
+    },
+    '2027-01-30': {
+        label: 'UT1HL Tournament',
+        note: 'United Tier 1 Hockey League tournament weekend in Boston.'
+    },
+    '2027-02-27': {
+        label: 'UT1HL Tier 1 Playoffs',
+        url: 'https://unitedtier1hockeyleague.com/tier-1-playoffs/',
+        note: 'United Tier 1 Hockey League playoffs in Massachusetts.'
+    }
+};
+
+function cleanDescription(value = '') {
+    return unescapeIcal(value)
+        .replace(/\s*-\s*\(Arrival Time:[^)]+\)\s*$/i, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function extractUrl(value = '') {
+    const match = value.match(/https?:\/\/[^\s)]+|\b(?:www\.)?[a-z0-9.-]+\.[a-z]{2,}\/[^\s)]+/i);
+    if (!match) return '';
+    const url = match[0].replace(/[.,;]+$/, '');
+    return /^https?:\/\//i.test(url) ? url : `https://${url}`;
+}
+
+function enrichEvent(event) {
+    const tournament = TOURNAMENT_DETAILS[event.date];
+    const descriptionUrl = extractUrl(event.description);
+    const label = tournament?.label || '';
+    return {
+        ...event,
+        tournamentLabel: label,
+        tournamentUrl: tournament?.url || descriptionUrl,
+        tournamentNote: tournament?.note || '',
+        displayTitle: label || event.title,
+        isTournament: Boolean(tournament || /tournament|showcase|playoffs|UT1HL|NAT1HL|CCM|Icebreaker/i.test(event.description))
+    };
+}
+
 function parseIcal(text) {
     const lines = text.replace(/\r?\n[ \t]/g, '').split(/\r?\n/);
     const parsed = [];
@@ -54,15 +134,19 @@ function parseIcal(text) {
             const start = parseIcalDate(item.DTSTART || '');
             const end = parseIcalDate(item.DTEND || '');
             if (start) {
-                parsed.push({
+                parsed.push(enrichEvent({
+                    id: `event-${parsed.length}`,
                     date: start.date,
                     title: unescapeIcal(item.SUMMARY || 'Team event'),
                     time: end && start.hour !== null
-                        ? `${formatTime(start)} - ${formatTime(end)}`
+                        ? (start.hour === 0 && start.minute === 0 && end.hour === 0 && end.minute === 0 && end.date !== start.date
+                            ? 'All day'
+                            : `${formatTime(start)} - ${formatTime(end)}`)
                         : formatTime(start),
                     loc: unescapeIcal(item.LOCATION),
+                    description: cleanDescription(item.DESCRIPTION || ''),
                     type: /camp/i.test(item.SUMMARY || '') ? 'camp' : 'u16'
-                });
+                }));
             }
             item = null;
             continue;
@@ -71,12 +155,39 @@ function parseIcal(text) {
         const separator = line.indexOf(':');
         if (separator < 0) continue;
         const key = line.slice(0, separator).split(';')[0];
-        if (['DTSTART', 'DTEND', 'SUMMARY', 'LOCATION'].includes(key)) {
+        if (['DTSTART', 'DTEND', 'SUMMARY', 'LOCATION', 'DESCRIPTION', 'URL'].includes(key)) {
             item[key] = line.slice(separator + 1);
         }
     }
 
     return parsed.sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
+}
+
+function eventNeedsDetails(event) {
+    return Boolean(event.isTournament || event.tournamentLabel || event.tournamentUrl || event.tournamentNote);
+}
+
+function renderEvent(event) {
+    const detailsClass = eventNeedsDetails(event) ? ' has-details' : '';
+    const tournamentClass = event.isTournament ? ' tournament' : '';
+    const label = event.tournamentLabel
+        ? `<div class="event-badge">Tournament</div>`
+        : '';
+    const linkHint = eventNeedsDetails(event)
+        ? '<div class="event-hint">Click for details ↗</div>'
+        : '';
+
+    return `
+        <button class="event ${event.type}${detailsClass}${tournamentClass}"
+                type="button"
+                data-event-id="${escapeHtml(event.id)}"
+                ${eventNeedsDetails(event) ? '' : 'disabled'}>
+            ${label}
+            <div class="event-time">${escapeHtml(event.time)}</div>
+            <b>${escapeHtml(event.displayTitle || event.title)}</b>
+            ${event.loc ? `<div class="event-loc">@ ${escapeHtml(event.loc)}</div>` : ''}
+            ${linkHint}
+        </button>`;
 }
 
 function renderCalendar(year, month) {
@@ -107,14 +218,7 @@ function renderCalendar(year, month) {
                     `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
                 let content = `<div class="date-num">${date}</div>`;
                 for (const event of events.filter(entry => entry.date === dateString)) {
-                    content += `
-                        <div class="event ${event.type}">
-                            <div class="event-time">${escapeHtml(event.time)}</div>
-                            <b>${escapeHtml(event.title)}</b>
-                            ${event.loc
-                                ? `<div class="event-loc">@ ${escapeHtml(event.loc)}</div>`
-                                : ''}
-                        </div>`;
+                    content += renderEvent(event);
                 }
                 cell.innerHTML = content;
                 date++;
@@ -140,6 +244,60 @@ function changeMonth(delta) {
 function downloadICS() {
     window.location.href = TEAMSNAP_ICAL_URL;
 }
+
+function openEventDetails(eventId) {
+    const event = events.find(entry => entry.id === eventId);
+    if (!event) return;
+
+    const modal = document.getElementById('eventModal');
+    const title = document.getElementById('modalTitle');
+    const body = document.getElementById('modalBody');
+    const link = document.getElementById('modalLink');
+
+    title.textContent = event.displayTitle || event.title;
+    body.innerHTML = `
+        <dl class="event-details-list">
+            <div><dt>Date</dt><dd>${escapeHtml(event.date)}</dd></div>
+            <div><dt>Time</dt><dd>${escapeHtml(event.time)}</dd></div>
+            ${event.loc ? `<div><dt>Location</dt><dd>${escapeHtml(event.loc)}</dd></div>` : ''}
+            ${event.tournamentNote ? `<div><dt>Scout note</dt><dd>${escapeHtml(event.tournamentNote)}</dd></div>` : ''}
+            ${event.description ? `<div><dt>TeamSnap details</dt><dd>${escapeHtml(event.description)}</dd></div>` : ''}
+        </dl>`;
+
+    if (event.tournamentUrl) {
+        link.href = event.tournamentUrl;
+        link.textContent = `Open ${event.tournamentLabel || 'event page'}`;
+        link.hidden = false;
+    } else {
+        link.hidden = true;
+        link.removeAttribute('href');
+    }
+
+    modal.hidden = false;
+    modal.classList.add('is-open');
+    document.body.classList.add('modal-open');
+    document.getElementById('modalClose').focus();
+}
+
+function closeEventDetails() {
+    const modal = document.getElementById('eventModal');
+    modal.classList.remove('is-open');
+    modal.hidden = true;
+    document.body.classList.remove('modal-open');
+}
+
+document.addEventListener('click', event => {
+    const eventButton = event.target.closest('[data-event-id]');
+    if (eventButton) {
+        openEventDetails(eventButton.dataset.eventId);
+        return;
+    }
+    if (event.target.matches('[data-close-modal]')) closeEventDetails();
+});
+
+document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') closeEventDetails();
+});
 
 function formatSyncedAt(value) {
     const date = new Date(value);
