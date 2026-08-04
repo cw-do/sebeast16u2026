@@ -106,16 +106,37 @@ function extractUrl(value = '') {
     return /^https?:\/\//i.test(url) ? url : `https://${url}`;
 }
 
+function simplifyTitle(value = '') {
+    return value
+        .replace(/^Southeast\s+Beast\s+16u\s*-\s*/i, '')
+        .replace(/^Southeast\s+Beast\s+16u\s+/i, '')
+        .replace(/\b16u\b/gi, '16U')
+        .trim();
+}
+
+function simplifyLocation(value = '') {
+    const location = value.trim();
+    if (!location) return '';
+    if (/110\s+S\s+Watt\s+Rd|Cool\s+Sports/i.test(location)) return 'Cool Sports';
+    if (/100\s+Lebanon\s+St|Ice\s+Chalet/i.test(location)) return 'Ice Chalet';
+    if (/500\s+Howard\s+Baker\s+Jr\s+Blvd|Civic\s+Coliseum|KCAC/i.test(location)) return 'KCAC';
+    return location;
+}
+
 function enrichEvent(event) {
     const tournament = TOURNAMENT_DETAILS[event.date];
     const descriptionUrl = extractUrl(event.description);
     const label = tournament?.label || '';
+    const shortTitle = simplifyTitle(event.title);
+    const shortLocation = simplifyLocation(event.loc);
     return {
         ...event,
+        shortTitle,
+        displayLoc: shortLocation,
         tournamentLabel: label,
         tournamentUrl: tournament?.url || descriptionUrl,
         tournamentNote: tournament?.note || '',
-        displayTitle: label || event.title,
+        displayTitle: label || shortTitle,
         isTournament: Boolean(tournament || /tournament|showcase|playoffs|UT1HL|NAT1HL|CCM|Icebreaker/i.test(event.description))
     };
 }
@@ -185,7 +206,7 @@ function renderEvent(event) {
             ${label}
             <div class="event-time">${escapeHtml(event.time)}</div>
             <b>${escapeHtml(event.displayTitle || event.title)}</b>
-            ${event.loc ? `<div class="event-loc">@ ${escapeHtml(event.loc)}</div>` : ''}
+            ${event.displayLoc ? `<div class="event-loc">@ ${escapeHtml(event.displayLoc)}</div>` : ''}
             ${linkHint}
         </button>`;
 }
@@ -259,7 +280,7 @@ function openEventDetails(eventId) {
         <dl class="event-details-list">
             <div><dt>Date</dt><dd>${escapeHtml(event.date)}</dd></div>
             <div><dt>Time</dt><dd>${escapeHtml(event.time)}</dd></div>
-            ${event.loc ? `<div><dt>Location</dt><dd>${escapeHtml(event.loc)}</dd></div>` : ''}
+            ${event.displayLoc ? `<div><dt>Location</dt><dd>${escapeHtml(event.displayLoc)}${event.loc && event.loc !== event.displayLoc ? `<br><span class="event-full-location">${escapeHtml(event.loc)}</span>` : ''}</dd></div>` : ''}
             ${event.tournamentNote ? `<div><dt>Scout note</dt><dd>${escapeHtml(event.tournamentNote)}</dd></div>` : ''}
             ${event.description ? `<div><dt>TeamSnap details</dt><dd>${escapeHtml(event.description)}</dd></div>` : ''}
         </dl>`;
