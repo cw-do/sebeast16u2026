@@ -7,7 +7,7 @@ X-WR-CALNAME:Southeast Beast 16u
 X-WR-CALDESC:The event schedule for the Southeast Beast 16u Ice Hockey team
 X-WR-TIMEZONE:America/New_York
 X-PUBLISHED-TTL:PT1H
-X-TS-TIMESTAMP:2026-08-07 19:16:05
+X-TS-TIMESTAMP:2026-08-08 01:24:43
 BEGIN:VTIMEZONE
 TZID:America/New_York
 BEGIN:DAYLIGHT
@@ -75,19 +75,16 @@ SEQUENCE:0
 SUMMARY:Southeast Beast 16u - Team Practice
 END:VEVENT
 BEGIN:VEVENT
-DTSTAMP:20260605T131514
+DTSTAMP:20260807T175623
 UID:10201455-368897778
-DTSTART:20260912T000000
-DTEND:20260913T000000
-DESCRIPTION:Location: Tam-O-Shanter - Jackson Weis Memorial Tournament\n ht
- tps://tamohockey.com/jackson-weis-memorial%2Fovc\nSept 11-13\nThis is NOT 
- a stay to play.\nVenues:\nSylvania Tam-O-Shanter\nToledo Ice House\nBowlin
- g Green State University \nThe Cube - Findlay\, OH -   (Arrival Time: 11:0
- 0 AM (Eastern Time (US & Canada))) 
-LAST-MODIFIED:20260605T131514
+DTSTART;TZID=America/New_York:20260912T190000
+DTEND;TZID=America/New_York:20260912T201500
+DESCRIPTION:Location: Tam-O-Shanter\n Friendly exhibition games only\nSylva
+ nia Tam-O-Shanter -  \n Uniform: White (Arrival Time:  7:00 PM (EDT)) 
+LAST-MODIFIED:20260807T175623
 LOCATION:7060 Sylvania Ave\, Sylvania\, OH 43560
 SEQUENCE:0
-SUMMARY:Southeast Beast 16u vs TBD
+SUMMARY:Southeast Beast 16u at Sylvania North Stars AAA
 END:VEVENT
 BEGIN:VEVENT
 DTSTAMP:20260605T131953
@@ -2641,5 +2638,17 @@ LAST-MODIFIED:20260728T204258
 LOCATION:530 N. Eatherton Rd Chesterfield\, MO 63005
 SEQUENCE:0
 SUMMARY:Southeast Beast 16u at Carshield 16U AAA
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20260807T175607
+UID:10201455-371284821
+DTSTART;TZID=America/New_York:20260913T103000
+DTEND;TZID=America/New_York:20260913T114500
+DESCRIPTION:Location: Tam-O-Shanter\n Friendly exhibition games only\nSylva
+ nia Tam-O-Shanter -  \n Uniform: White (Arrival Time: 10:30 AM (EDT)) 
+LAST-MODIFIED:20260807T175607
+LOCATION:7060 Sylvania Ave\, Sylvania\, OH 43560
+SEQUENCE:0
+SUMMARY:Southeast Beast 16u at Sylvania North Stars AAA
 END:VEVENT
 END:VCALENDAR
