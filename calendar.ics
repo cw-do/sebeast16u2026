@@ -7,7 +7,7 @@ X-WR-CALNAME:Southeast Beast 16u
 X-WR-CALDESC:The event schedule for the Southeast Beast 16u Ice Hockey team
 X-WR-TIMEZONE:America/New_York
 X-PUBLISHED-TTL:PT1H
-X-TS-TIMESTAMP:2026-08-11 12:47:22
+X-TS-TIMESTAMP:2026-08-11 16:47:27
 BEGIN:VTIMEZONE
 TZID:America/New_York
 BEGIN:DAYLIGHT
@@ -272,14 +272,15 @@ SEQUENCE:0
 SUMMARY:Southeast Beast 16u at Jr. Carolina Hurricanes 16u AAA
 END:VEVENT
 BEGIN:VEVENT
-DTSTAMP:20260613T193942
+DTSTAMP:20260811T112046
 UID:10201455-369171236
-DTSTART:20260905T000000
-DTEND:20260906T000000
-DESCRIPTION:3 Exhibition games on Saturday 9/5 and Sunday 9/6 only.  Rink a
- nd times still TBD -  \n Uniform: White (Arrival Time: 12:00 AM (EDT)) 
-LAST-MODIFIED:20260613T193942
-LOCATION:Pittsburgh
+DTSTART;TZID=America/New_York:20260905T120000
+DTEND;TZID=America/New_York:20260905T131500
+DESCRIPTION:Location: Frozen Pond Arena\n 3 Exhibition games on Saturday 9/
+ 5 and Sunday 9/6 only. -  \n Uniform: White (Arrival Time: 11:00 AM (EDT))
+  
+LAST-MODIFIED:20260811T112046
+LOCATION:118 Sylvan Spring Ln Valencia\, PA\, United States
 SEQUENCE:0
 SUMMARY:Southeast Beast 16u at Pittsburgh Icemen
 END:VEVENT
@@ -2661,5 +2662,31 @@ LAST-MODIFIED:20260808T120321
 LOCATION:100 Lebanon St. Knoxville
 SEQUENCE:0
 SUMMARY:Southeast Beast 16u - Training Camp- bonus ice!!!!
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20260811T112105
+UID:10201455-371506547
+DTSTART;TZID=America/New_York:20260905T170000
+DTEND;TZID=America/New_York:20260905T181500
+DESCRIPTION:Location: Frozen Pond Arena\n 3 Exhibition games on Saturday 9/
+ 5 and Sunday 9/6 only. -  \n Uniform: White (Arrival Time:  4:00 PM (EDT))
+  
+LAST-MODIFIED:20260811T112105
+LOCATION:118 Sylvan Spring Ln Valencia\, PA\, United States
+SEQUENCE:0
+SUMMARY:Southeast Beast 16u at Pittsburgh Icemen
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20260811T112128
+UID:10201455-371506640
+DTSTART;TZID=America/New_York:20260906T083000
+DTEND;TZID=America/New_York:20260906T094500
+DESCRIPTION:Location: Frozen Pond Arena\n 3 Exhibition games on Saturday 9/
+ 5 and Sunday 9/6 only. -  \n Uniform: White (Arrival Time:  7:30 AM (EDT))
+  
+LAST-MODIFIED:20260811T112128
+LOCATION:118 Sylvan Spring Ln Valencia\, PA\, United States
+SEQUENCE:0
+SUMMARY:Southeast Beast 16u at Pittsburgh Icemen
 END:VEVENT
 END:VCALENDAR
