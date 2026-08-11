@@ -123,12 +123,23 @@ function simplifyLocation(value = '') {
     return location;
 }
 
+function isWeekendDate(dateString) {
+    const day = new Date(`${dateString}T00:00:00`).getDay();
+    return day === 0 || day === 6;
+}
+
+function isGameEventTitle(value = '') {
+    return /\b(?:vs|at)\b/i.test(value) && !/practice|video review|off ice|training camp|pool party|top golf/i.test(value);
+}
+
 function enrichEvent(event) {
     const tournament = TOURNAMENT_DETAILS[event.date];
     const descriptionUrl = extractUrl(event.description);
     const label = tournament?.label || '';
     const shortTitle = simplifyTitle(event.title);
     const shortLocation = simplifyLocation(event.loc);
+    const isTournament = Boolean(tournament || /tournament|showcase|playoffs|UT1HL|NAT1HL|CCM|Icebreaker/i.test(event.description));
+    const isWeekendGame = isWeekendDate(event.date) && isGameEventTitle(event.title);
     return {
         ...event,
         shortTitle,
@@ -137,7 +148,8 @@ function enrichEvent(event) {
         tournamentUrl: tournament?.url || descriptionUrl,
         tournamentNote: tournament?.note || '',
         displayTitle: label || shortTitle,
-        isTournament: Boolean(tournament || /tournament|showcase|playoffs|UT1HL|NAT1HL|CCM|Icebreaker/i.test(event.description))
+        isTournament,
+        isWeekendGame
     };
 }
 
@@ -185,7 +197,7 @@ function parseIcal(text) {
 }
 
 function eventNeedsDetails(event) {
-    return Boolean(event.isTournament || event.tournamentLabel || event.tournamentUrl || event.tournamentNote);
+    return Boolean(event.isTournament || event.isWeekendGame || event.tournamentLabel || event.tournamentUrl || event.tournamentNote);
 }
 
 function renderEvent(event) {
