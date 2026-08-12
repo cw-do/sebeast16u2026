@@ -311,6 +311,150 @@
             overflow: hidden;
         }
 
+        .location-section {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-top: 18px;
+            padding: 18px;
+        }
+
+        .location-section h2 {
+            color: var(--primary);
+            font-size: 20px;
+            margin: 0 0 4px;
+        }
+
+        .location-subtitle {
+            color: #64748b;
+            font-size: 13px;
+            margin: 0 0 14px;
+        }
+
+        .location-layout {
+            display: grid;
+            gap: 16px;
+            grid-template-columns: minmax(0, 1.5fr) minmax(260px, 0.85fr);
+        }
+
+        .map-panel {
+            background: #f5efe5;
+            border: 1px solid #e7dccb;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .map-svg {
+            display: block;
+            height: auto;
+            width: 100%;
+        }
+
+        .map-pin {
+            cursor: pointer;
+            filter: drop-shadow(0 2px 3px rgba(15, 23, 42, 0.25));
+            transition: opacity 0.16s ease, transform 0.16s ease;
+        }
+
+        .map-pin.is-muted {
+            opacity: 0.32;
+        }
+
+        .map-pin.is-highlighted {
+            transform: scale(1.16);
+            transform-origin: center;
+        }
+
+        .map-pin circle {
+            fill: #dc2626;
+            stroke: white;
+            stroke-width: 3;
+        }
+
+        .map-pin.is-highlighted circle {
+            fill: #f59e0b;
+            stroke: #7c2d12;
+            stroke-width: 4;
+        }
+
+        .map-label {
+            fill: #1f2937;
+            font-size: 15px;
+            font-weight: 800;
+            paint-order: stroke;
+            stroke: rgba(255, 255, 255, 0.86);
+            stroke-width: 4px;
+        }
+
+        .map-date-label {
+            fill: #334155;
+            font-size: 12px;
+            paint-order: stroke;
+            stroke: rgba(255, 255, 255, 0.86);
+            stroke-width: 3px;
+        }
+
+        .location-list {
+            display: grid;
+            gap: 8px;
+        }
+
+        .location-card {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-left: 4px solid #ef4444;
+            border-radius: 10px;
+            cursor: pointer;
+            padding: 10px 12px;
+            text-align: left;
+            transition: background 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease;
+        }
+
+        .location-card.is-muted {
+            opacity: 0.46;
+        }
+
+        .location-card.is-highlighted {
+            background: #fffbeb;
+            border-color: #f59e0b;
+            box-shadow: 0 8px 18px rgba(245, 158, 11, 0.18);
+        }
+
+        .location-card-title {
+            color: #0f172a;
+            font-weight: 800;
+            margin-bottom: 3px;
+        }
+
+        .location-card-dates {
+            color: #475569;
+            font-size: 12px;
+            line-height: 1.35;
+        }
+
+        .location-card-note {
+            color: #0369a1;
+            font-size: 11px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .location-empty {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .calendar td.has-location-event {
+            cursor: pointer;
+        }
+
+        .calendar td.selected-date {
+            background: #fff7ed;
+            box-shadow: inset 0 0 0 3px #f59e0b;
+        }
+
         .camp { background-color: #fef3c7; border-left: 3px solid #d97706; color: #78350f; }
         .u16 { background-color: #dbeafe; border-left: 3px solid #2563eb; color: #1e40af; }
         
@@ -374,6 +518,20 @@
         .sync-btn:disabled {
             cursor: wait;
             opacity: 0.6;
+        }
+
+        @media (max-width: 720px) {
+            .location-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .map-label {
+                font-size: 12px;
+            }
+
+            .map-date-label {
+                font-size: 10px;
+            }
         }
 
         @media (max-width: 600px) {
@@ -442,6 +600,14 @@
             <span>Tournament / Showcase Weekend</span>
         </div>
     </div>
+
+    <section class="location-section" aria-labelledby="locationMapTitle">
+        <h2 id="locationMapTitle">Southeast Beast 16U — 2026–27 game locations</h2>
+        <p class="location-subtitle">Every game and tournament weekend on the schedule, grouped by location. Click a game date in the calendar to highlight its location.</p>
+        <div id="locationMap" class="location-layout">
+            <p class="location-empty">Loading game locations…</p>
+        </div>
+    </section>
 </div>
 
 <div id="eventModal" class="modal-backdrop" hidden data-close-modal>
@@ -667,7 +833,7 @@ END:VCALENDAR`;
     // Initialize Calendar for August 2026
     renderCalendar(currentYear, currentMonth);
 </script>
-<script src="app.js?v=20260804-weekend-game-details"></script>
+<script src="app.js?v=20260812-location-map"></script>
 
 </body>
 </html>
