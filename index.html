@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>16U Hockey Practice Schedule</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIINfQ6fiMJ0ptXnqCO9I0w3++ytddNQcxAc=" crossorigin="">
     <style>
         :root {
             --primary: #1e3a8a;
@@ -333,67 +334,135 @@
         }
 
         .location-layout {
+            align-items: start;
             display: grid;
             gap: 16px;
             grid-template-columns: minmax(0, 1.5fr) minmax(260px, 0.85fr);
         }
 
         .map-panel {
-            background: #f5efe5;
-            border: 1px solid #e7dccb;
+            background: #eef2f7;
+            border: 1px solid var(--border);
             border-radius: 10px;
+            min-height: 420px;
             overflow: hidden;
             position: relative;
         }
 
-        .map-svg {
-            display: block;
-            height: auto;
+        #gameLocationMap {
+            height: 420px;
+            min-height: 420px;
             width: 100%;
         }
 
-        .map-pin {
-            cursor: pointer;
-            filter: drop-shadow(0 2px 3px rgba(15, 23, 42, 0.25));
-            transition: opacity 0.16s ease, transform 0.16s ease;
+        /* Inline the essential Leaflet layout rules so the real map still works if the CDN stylesheet is slow or blocked. */
+        .leaflet-container {
+            overflow: hidden;
+            position: relative;
         }
 
-        .map-pin.is-muted {
-            opacity: 0.32;
+        .leaflet-pane,
+        .leaflet-tile,
+        .leaflet-marker-icon,
+        .leaflet-marker-shadow,
+        .leaflet-tile-container,
+        .leaflet-pane > svg,
+        .leaflet-pane > canvas,
+        .leaflet-zoom-box,
+        .leaflet-image-layer,
+        .leaflet-layer {
+            left: 0;
+            position: absolute;
+            top: 0;
         }
 
-        .map-pin.is-highlighted {
-            transform: scale(1.16);
-            transform-origin: center;
+        .leaflet-tile,
+        .leaflet-marker-icon,
+        .leaflet-marker-shadow {
+            user-select: none;
+            -webkit-user-drag: none;
         }
 
-        .map-pin circle {
-            fill: #dc2626;
-            stroke: white;
-            stroke-width: 3;
+        .leaflet-tile-pane { z-index: 200; }
+        .leaflet-overlay-pane { z-index: 400; }
+        .leaflet-shadow-pane { z-index: 500; }
+        .leaflet-marker-pane { z-index: 600; }
+        .leaflet-tooltip-pane { z-index: 650; }
+        .leaflet-popup-pane { z-index: 700; }
+
+        .leaflet-control {
+            position: relative;
+            z-index: 800;
         }
 
-        .map-pin.is-highlighted circle {
-            fill: #f59e0b;
-            stroke: #7c2d12;
-            stroke-width: 4;
+        .leaflet-top,
+        .leaflet-bottom {
+            pointer-events: none;
+            position: absolute;
+            z-index: 1000;
         }
 
-        .map-label {
-            fill: #1f2937;
-            font-size: 15px;
-            font-weight: 800;
-            paint-order: stroke;
-            stroke: rgba(255, 255, 255, 0.86);
-            stroke-width: 4px;
+        .leaflet-top { top: 0; }
+        .leaflet-right { right: 0; }
+        .leaflet-bottom { bottom: 0; }
+        .leaflet-left { left: 0; }
+        .leaflet-control { pointer-events: auto; }
+        .leaflet-top .leaflet-control { margin-top: 10px; }
+        .leaflet-left .leaflet-control { margin-left: 10px; }
+        .leaflet-right .leaflet-control { margin-right: 10px; }
+        .leaflet-bottom .leaflet-control { margin-bottom: 10px; }
+
+        .leaflet-control-zoom a {
+            background: white;
+            border-bottom: 1px solid #d1d5db;
+            color: #111827;
+            display: block;
+            font: bold 18px/26px Arial, sans-serif;
+            height: 26px;
+            text-align: center;
+            text-decoration: none;
+            width: 26px;
         }
 
-        .map-date-label {
-            fill: #334155;
-            font-size: 12px;
-            paint-order: stroke;
-            stroke: rgba(255, 255, 255, 0.86);
-            stroke-width: 3px;
+        .leaflet-control-attribution {
+            background: rgba(255, 255, 255, 0.8);
+            font-size: 11px;
+            padding: 2px 5px;
+        }
+
+        .leaflet-popup-content {
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .leaflet-marker-icon.is-muted {
+            opacity: 0.35;
+        }
+
+        .location-marker {
+            align-items: center;
+            background: #dc2626;
+            border: 3px solid white;
+            border-radius: 999px;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.35);
+            color: white;
+            display: flex;
+            font-size: 14px;
+            font-weight: 900;
+            height: 22px;
+            justify-content: center;
+            width: 22px;
+        }
+
+        .location-marker.home {
+            background: #2563eb;
+        }
+
+        .location-marker.highlighted {
+            background: #f59e0b;
+            border-color: #7c2d12;
+            color: #111827;
+            transform: scale(1.22);
         }
 
         .location-list {
@@ -426,6 +495,18 @@
             color: #0f172a;
             font-weight: 800;
             margin-bottom: 3px;
+        }
+
+        .location-home-label {
+            background: #dbeafe;
+            border-radius: 999px;
+            color: #1e40af;
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 900;
+            margin-left: 6px;
+            padding: 2px 6px;
+            vertical-align: 2px;
         }
 
         .location-card-dates {
@@ -523,14 +604,6 @@
         @media (max-width: 720px) {
             .location-layout {
                 grid-template-columns: 1fr;
-            }
-
-            .map-label {
-                font-size: 12px;
-            }
-
-            .map-date-label {
-                font-size: 10px;
             }
         }
 
@@ -833,7 +906,8 @@ END:VCALENDAR`;
     // Initialize Calendar for August 2026
     renderCalendar(currentYear, currentMonth);
 </script>
-<script src="app.js?v=20260812-location-map"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="app.js?v=20260812-real-map-home"></script>
 
 </body>
 </html>

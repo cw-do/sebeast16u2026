@@ -94,16 +94,20 @@ const TOURNAMENT_DETAILS = {
 };
 
 const GAME_LOCATION_DETAILS = {
-    pittsburgh: { name: 'Pittsburgh, PA', match: /pittsburgh|valencia|frozen pond/i, x: 555, y: 242, labelDx: 22, labelDy: 0 },
-    sylvania: { name: 'Sylvania, OH', match: /sylvania|tam-o-shanter|toledo/i, x: 426, y: 210, labelDx: -120, labelDy: 43 },
-    chicago: { name: 'Chicago, IL', match: /chicago|elk grove|vernon hills|lake forest|rosemont|hoffman estates/i, x: 286, y: 205, labelDx: -72, labelDy: -18 },
-    troy: { name: 'Troy, MI', match: /troy/i, x: 462, y: 170, labelDx: -25, labelDy: -34 },
-    detroit: { name: 'Detroit, MI', match: /detroit\b/i, x: 448, y: 205, labelDx: 30, labelDy: 28 },
-    waterloo: { name: 'Waterloo, ON', match: /waterloo/i, x: 536, y: 158, labelDx: 26, labelDy: 5 },
-    boston: { name: 'Boston, MA', match: /boston|middleton|tewksbury|new england sports center|essex sports|breakaway ice/i, x: 825, y: 200, labelDx: -116, labelDy: 15 },
-    raleigh: { name: 'Raleigh, NC', match: /raleigh|wake forest/i, x: 610, y: 310, labelDx: 26, labelDy: 10 },
-    chesterfield: { name: 'Chesterfield, MO', match: /chesterfield|car shield|maryville/i, x: 190, y: 285, labelDx: 28, labelDy: 10 }
+    knoxville: { name: 'Knoxville, TN', match: /knoxville|cool sports|ice chalet|kcac|civic coliseum|howard baker|watt rd|lebanon st/i, lat: 35.9606, lng: -83.9207, home: true },
+    pittsburgh: { name: 'Pittsburgh, PA', match: /pittsburgh|valencia|frozen pond/i, lat: 40.4406, lng: -79.9959 },
+    sylvania: { name: 'Sylvania, OH', match: /sylvania|tam-o-shanter|toledo/i, lat: 41.7189, lng: -83.7127 },
+    chicago: { name: 'Chicago, IL', match: /chicago|elk grove|vernon hills|lake forest|rosemont|hoffman estates/i, lat: 41.8781, lng: -87.6298 },
+    troy: { name: 'Troy, MI', match: /troy/i, lat: 42.6064, lng: -83.1498 },
+    detroit: { name: 'Detroit, MI', match: /detroit\b/i, lat: 42.3314, lng: -83.0458 },
+    waterloo: { name: 'Waterloo, ON', match: /waterloo/i, lat: 43.4643, lng: -80.5204 },
+    boston: { name: 'Boston, MA', match: /boston|middleton|tewksbury|new england sports center|essex sports|breakaway ice/i, lat: 42.3601, lng: -71.0589 },
+    raleigh: { name: 'Raleigh, NC', match: /raleigh|wake forest/i, lat: 35.7796, lng: -78.6382 },
+    chesterfield: { name: 'Chesterfield, MO', match: /chesterfield|car shield|maryville/i, lat: 38.6631, lng: -90.5771 }
 };
+
+let locationMapInstance = null;
+let locationMarkers = {};
 
 function cleanDescription(value = '') {
     return unescapeIcal(value)
@@ -243,8 +247,85 @@ function buildGameLocations() {
         grouped.get(event.locationKey).push(event);
     }
     return Object.entries(GAME_LOCATION_DETAILS)
-        .filter(([key]) => grouped.has(key))
-        .map(([key, detail]) => ({ key, ...detail, events: grouped.get(key), dates: summarizeLocationEvents(grouped.get(key)) }));
+        .filter(([key, detail]) => detail.home || grouped.has(key))
+        .map(([key, detail]) => {
+            const locationEvents = grouped.get(key) || [];
+            return {
+                key,
+                ...detail,
+                events: locationEvents,
+                dates: detail.home
+                    ? ['Home base — Knoxville / Cool Sports / Ice Chalet / KCAC']
+                    : summarizeLocationEvents(locationEvents)
+            };
+        });
+}
+
+function markerHtml(location) {
+    const highlighted = selectedLocationKey === location.key ? ' highlighted' : '';
+    const home = location.home ? ' home' : '';
+    return `<div class="location-marker${home}${highlighted}">${location.home ? 'H' : '•'}</div>`;
+}
+
+function markerIcon(location) {
+    const muted = selectedLocationKey && location.key !== selectedLocationKey ? ' is-muted' : '';
+    return L.divIcon({
+        className: `location-marker-wrap${muted}`,
+        html: markerHtml(location),
+        iconSize: [28, 28],
+        iconAnchor: [14, 14],
+        popupAnchor: [0, -14]
+    });
+}
+
+function updateLeafletMarkerStyles() {
+    Object.entries(locationMarkers).forEach(([key, marker]) => {
+        const location = { key, ...GAME_LOCATION_DETAILS[key] };
+        marker.setIcon(markerIcon(location));
+    });
+}
+
+function fitLeafletMap(bounds) {
+    if (!locationMapInstance || !bounds.length) return;
+    locationMapInstance.invalidateSize();
+    locationMapInstance.fitBounds(bounds, { padding: [32, 32], maxZoom: 5 });
+}
+
+function renderLeafletMap(locations) {
+    const mapContainer = document.getElementById('gameLocationMap');
+    if (!mapContainer) return;
+    if (typeof L === 'undefined') {
+        mapContainer.innerHTML = '<p class="location-empty">Interactive map could not be loaded. Please refresh the page.</p>';
+        return;
+    }
+    if (!locationMapInstance) {
+        locationMapInstance = L.map('gameLocationMap', {
+            scrollWheelZoom: false,
+            worldCopyJump: false
+        }).setView([39.6, -82.8], 5);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 12,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(locationMapInstance);
+    }
+
+    Object.values(locationMarkers).forEach(marker => marker.remove());
+    locationMarkers = {};
+
+    const bounds = [];
+    for (const location of locations) {
+        const marker = L.marker([location.lat, location.lng], {
+            icon: markerIcon(location)
+        }).addTo(locationMapInstance);
+        marker.bindPopup(`<strong>${escapeHtml(location.name)}</strong><br>${location.dates.map(item => escapeHtml(item)).join('<br>')}`);
+        marker.on('click', () => selectLocation(location.key));
+        locationMarkers[location.key] = marker;
+        bounds.push([location.lat, location.lng]);
+    }
+
+    updateLeafletMarkerStyles();
+    fitLeafletMap(bounds);
+    setTimeout(() => fitLeafletMap(bounds), 100);
 }
 
 function renderLocationMap() {
@@ -258,40 +339,24 @@ function renderLocationMap() {
 
     const mutedClass = key => selectedLocationKey && key !== selectedLocationKey ? ' is-muted' : '';
     const highlightedClass = key => selectedLocationKey === key ? ' is-highlighted' : '';
-    const pins = locations.map(location => `
-        <g class="map-pin${mutedClass(location.key)}${highlightedClass(location.key)}" data-location-key="${escapeHtml(location.key)}" role="button" tabindex="0" aria-label="Highlight ${escapeHtml(location.name)}">
-            <circle cx="${location.x}" cy="${location.y}" r="12"></circle>
-            <circle cx="${location.x}" cy="${location.y}" r="4" fill="white" stroke="none"></circle>
-        </g>
-        <text class="map-label${mutedClass(location.key)}" x="${location.x + location.labelDx}" y="${location.y + location.labelDy}">${escapeHtml(location.name)}</text>
-        <text class="map-date-label${mutedClass(location.key)}" x="${location.x + location.labelDx}" y="${location.y + location.labelDy + 18}">${escapeHtml(location.dates[0] || '')}</text>
-    `).join('');
-
     const cards = locations.map(location => `
         <button class="location-card${mutedClass(location.key)}${highlightedClass(location.key)}" type="button" data-location-key="${escapeHtml(location.key)}">
-            <div class="location-card-title">${escapeHtml(location.name)}</div>
+            <div class="location-card-title">${escapeHtml(location.name)}${location.home ? ' <span class="location-home-label">HOME</span>' : ''}</div>
             <div class="location-card-dates">${location.dates.map(item => `<div>${escapeHtml(item)}</div>`).join('')}</div>
             ${selectedLocationKey === location.key ? '<div class="location-card-note">Selected from calendar</div>' : ''}
         </button>
     `).join('');
 
+    if (locationMapInstance) {
+        locationMapInstance.remove();
+        locationMapInstance = null;
+        locationMarkers = {};
+    }
     container.innerHTML = `
-        <div class="map-panel">
-            <svg class="map-svg" viewBox="0 0 920 390" role="img" aria-label="Game locations map">
-                <rect width="920" height="520" fill="#f5efe5"></rect>
-                <path d="M0 92 C90 72 126 40 218 46 C309 52 353 81 435 70 C548 55 630 35 743 58 C815 72 858 90 920 81 L920 520 L0 520 Z" fill="#eee7dc"></path>
-                <path d="M0 355 C78 345 138 352 206 323 C305 281 352 298 428 272 C518 242 607 253 690 224 C774 195 835 192 920 170 L920 520 L0 520 Z" fill="#efe6d8"></path>
-                <path d="M365 80 C405 62 456 78 462 126 C467 165 445 184 415 169 C385 153 332 145 324 118 C318 98 342 88 365 80 Z" fill="#bdd7e7" opacity="0.95"></path>
-                <path d="M475 135 C505 125 543 145 548 182 C554 222 530 252 493 249 C468 247 455 220 463 193 C470 168 454 147 475 135 Z" fill="#bdd7e7" opacity="0.95"></path>
-                <path d="M725 86 C782 68 852 85 920 112 L920 520 L707 520 C731 458 740 383 722 317 C704 254 671 197 687 145 C693 121 705 96 725 86 Z" fill="#bdd7e7" opacity="0.95"></path>
-                <path d="M598 376 C643 395 678 425 696 468 C652 472 612 462 581 433 C552 406 557 380 598 376 Z" fill="#bdd7e7" opacity="0.95"></path>
-                <path d="M58 170 H874 M60 260 H860 M80 350 H802 M160 80 V480 M310 72 V465 M470 70 V470 M630 64 V470 M790 80 V446" stroke="#d9d1c4" stroke-width="1" opacity="0.72"></path>
-                <text x="22" y="38" fill="#64748b" font-size="12" font-weight="700">Approximate U.S. / Canada game travel map</text>
-                ${pins}
-            </svg>
-        </div>
+        <div class="map-panel"><div id="gameLocationMap" role="img" aria-label="Game locations map"></div></div>
         <div class="location-list" aria-label="Game locations list">${cards}</div>
     `;
+    renderLeafletMap(locations);
 }
 
 function selectLocation(locationKey = '') {
