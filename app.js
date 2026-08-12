@@ -243,13 +243,49 @@ function summarizeLocationEvents(locationEvents) {
         .map(([date, titles]) => `${formatDateShort(date)} — ${[...new Set(titles)].join(', ')}`);
 }
 
+function formatDateRange(startDateString, endDateString) {
+    const start = new Date(`${startDateString}T00:00:00`);
+    const end = new Date(`${endDateString}T00:00:00`);
+    const startMonth = new Intl.DateTimeFormat('en-US', { month: 'short' }).format(start);
+    const endMonth = new Intl.DateTimeFormat('en-US', { month: 'short' }).format(end);
+    const startDay = start.getDate();
+    const endDay = end.getDate();
+
+    if (startDateString === endDateString) return `${startMonth} ${startDay}`;
+    if (startMonth === endMonth) return `${startMonth} ${startDay}-${endDay}`;
+    return `${startMonth} ${startDay}-${endMonth} ${endDay}`;
+}
+
+function summarizeLocationMarkerDates(locationEvents) {
+    const dates = [...new Set(locationEvents.map(event => event.date))].sort();
+    if (!dates.length) return '';
+
+    const ranges = [];
+    let rangeStart = dates[0];
+    let rangeEnd = dates[0];
+
+    for (const dateString of dates.slice(1)) {
+        const nextExpected = new Date(`${rangeEnd}T00:00:00`);
+        nextExpected.setDate(nextExpected.getDate() + 1);
+        const expectedString = nextExpected.toISOString().slice(0, 10);
+
+        if (dateString === expectedString) {
+            rangeEnd = dateString;
+        } else {
+            ranges.push(formatDateRange(rangeStart, rangeEnd));
+            rangeStart = dateString;
+            rangeEnd = dateString;
+        }
+    }
+    ranges.push(formatDateRange(rangeStart, rangeEnd));
+
+    return ranges.join('/');
+}
+
 function summarizeLocationMarkerLabel(location) {
     if (location.home) return location.name;
-    const dates = [...new Set(location.events.map(event => formatDateShort(event.date)))];
-    const dateLabel = dates.length > 2
-        ? `${dates.slice(0, 2).join(' / ')} +${dates.length - 2}`
-        : dates.join(' / ');
-    return dateLabel ? `${dateLabel} — ${location.name}` : location.name;
+    const dateLabel = summarizeLocationMarkerDates(location.events);
+    return dateLabel ? `${dateLabel}, ${location.name}` : location.name;
 }
 
 function formatDriveSummary(location) {
