@@ -106,6 +106,21 @@ const GAME_LOCATION_DETAILS = {
     chesterfield: { name: 'Chesterfield, MO', match: /chesterfield|car shield|maryville/i, lat: 38.6631, lng: -90.5771, drive: { miles: 506, hours: 9.3 } }
 };
 
+// Historical daily-normal style averages, shown because most games are too far out for forecasts.
+// Values are monthly average high/low Fahrenheit by game-location metro area.
+const MONTHLY_AVERAGE_TEMPS = {
+    knoxville: { high: [48, 53, 62, 71, 78, 85, 88, 87, 82, 71, 60, 51], low: [30, 33, 41, 49, 58, 66, 70, 69, 62, 50, 40, 33] },
+    pittsburgh: { high: [36, 39, 49, 62, 72, 80, 84, 82, 76, 64, 51, 40], low: [21, 23, 31, 42, 52, 61, 65, 63, 56, 45, 35, 26] },
+    sylvania: { high: [33, 37, 48, 61, 72, 81, 84, 82, 76, 63, 50, 38], low: [19, 21, 29, 40, 51, 61, 65, 63, 56, 44, 34, 25] },
+    chicago: { high: [32, 36, 47, 59, 70, 80, 84, 82, 75, 62, 49, 37], low: [18, 22, 31, 41, 51, 61, 67, 65, 57, 45, 34, 24] },
+    troy: { high: [32, 35, 46, 59, 70, 79, 83, 81, 74, 61, 48, 36], low: [18, 20, 29, 39, 50, 60, 64, 62, 55, 43, 33, 24] },
+    detroit: { high: [32, 35, 46, 59, 70, 79, 83, 81, 74, 61, 48, 36], low: [18, 20, 29, 39, 50, 60, 64, 62, 55, 43, 33, 24] },
+    waterloo: { high: [27, 30, 40, 54, 66, 75, 79, 77, 70, 57, 44, 32], low: [12, 14, 23, 34, 45, 55, 60, 58, 50, 39, 30, 19] },
+    boston: { high: [37, 39, 46, 57, 67, 76, 82, 80, 73, 62, 51, 42], low: [22, 24, 31, 41, 50, 60, 66, 65, 57, 46, 37, 28] },
+    raleigh: { high: [51, 55, 63, 72, 80, 87, 90, 88, 82, 72, 62, 53], low: [32, 35, 42, 50, 59, 68, 72, 70, 64, 51, 41, 35] },
+    chesterfield: { high: [40, 45, 57, 68, 77, 86, 90, 88, 81, 69, 56, 44], low: [23, 27, 37, 47, 57, 67, 71, 69, 61, 49, 38, 28] }
+};
+
 const HOME_LOCATION_KEY = 'knoxville';
 let locationMapInstance = null;
 let locationMarkers = {};
@@ -232,7 +247,17 @@ function formatDateShort(dateString) {
     return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(date);
 }
 
-function summarizeLocationEvents(locationEvents) {
+function formatAverageTemp(locationKey, dateString) {
+    const averages = MONTHLY_AVERAGE_TEMPS[locationKey];
+    if (!averages) return '';
+    const monthIndex = Number(dateString.slice(5, 7)) - 1;
+    const high = averages.high?.[monthIndex];
+    const low = averages.low?.[monthIndex];
+    if (!Number.isFinite(high) || !Number.isFinite(low)) return '';
+    return `${Math.round(high)}F~${Math.round(low)}F avg`;
+}
+
+function summarizeLocationEvents(locationKey, locationEvents) {
     const byDate = new Map();
     for (const event of locationEvents) {
         if (!byDate.has(event.date)) byDate.set(event.date, []);
@@ -240,7 +265,11 @@ function summarizeLocationEvents(locationEvents) {
     }
     return Array.from(byDate.entries())
         .sort(([a], [b]) => a.localeCompare(b))
-        .map(([date, titles]) => `${formatDateShort(date)} — ${[...new Set(titles)].join(', ')}`);
+        .map(([date, titles]) => {
+            const temp = formatAverageTemp(locationKey, date);
+            const tempLabel = temp ? ` (${temp})` : '';
+            return `${formatDateShort(date)} — ${[...new Set(titles)].join(', ')}${tempLabel}`;
+        });
 }
 
 function formatDateRange(startDateString, endDateString) {
@@ -309,7 +338,7 @@ function buildGameLocations() {
                 events: locationEvents,
                 dates: detail.home
                     ? ['Home base — Knoxville / Cool Sports / Ice Chalet / KCAC']
-                    : summarizeLocationEvents(locationEvents)
+                    : summarizeLocationEvents(key, locationEvents)
             };
         });
 }
