@@ -257,6 +257,10 @@ function formatAverageTemp(locationKey, dateString) {
     return `${Math.round(high)}F~${Math.round(low)}F avg`;
 }
 
+function formatLocationDateHtml(item) {
+    return escapeHtml(item).replace(/\((\d+F~\d+F avg)\)/g, '<span class="location-temp">($1)</span>');
+}
+
 function summarizeLocationEvents(locationKey, locationEvents) {
     const byDate = new Map();
     for (const event of locationEvents) {
@@ -320,6 +324,24 @@ function summarizeLocationMarkerLabel(location) {
 function formatDriveSummary(location) {
     if (!location.drive) return '';
     return `${location.drive.hours.toFixed(1)} hr · ${location.drive.miles.toLocaleString()} mi`;
+}
+
+function renderLocationCards(locations) {
+    const mutedClass = key => selectedLocationKey && key !== selectedLocationKey ? ' is-muted' : '';
+    const highlightedClass = key => selectedLocationKey === key ? ' is-highlighted' : '';
+    return locations.map(location => {
+        const driveSummary = formatDriveSummary(location);
+        return `
+        <button class="location-card${mutedClass(location.key)}${highlightedClass(location.key)}" type="button" data-location-key="${escapeHtml(location.key)}">
+            <div class="location-card-title">
+                <span>${escapeHtml(location.name)}${location.home ? ' <span class="location-home-label">HOME</span>' : ''}</span>
+                ${driveSummary ? `<span class="location-drive-summary">${escapeHtml(driveSummary)}</span>` : ''}
+            </div>
+            <div class="location-card-dates">${location.dates.map(item => `<div>${formatLocationDateHtml(item)}</div>`).join('')}</div>
+            ${selectedLocationKey === location.key ? '<div class="location-card-note">Selected — driving route shown on map</div>' : ''}
+        </button>
+    `;
+    }).join('');
 }
 
 function buildGameLocations() {
@@ -410,11 +432,6 @@ async function drawDrivingRoute(location) {
                 weight: 5
             }
         }).addTo(locationMapInstance);
-
-        const routeBounds = drivingRouteLayer.getBounds();
-        if (routeBounds.isValid()) {
-            locationMapInstance.fitBounds(routeBounds, { padding: [36, 36], maxZoom: 7 });
-        }
     } catch (error) {
         console.warn('Driving route could not be loaded:', error);
         clearDrivingRoute();
@@ -457,7 +474,7 @@ function renderLeafletMap(locations) {
         const marker = L.marker([location.lat, location.lng], {
             icon: markerIcon(location)
         }).addTo(locationMapInstance);
-        marker.bindPopup(`<strong>${escapeHtml(location.name)}</strong><br>${location.dates.map(item => escapeHtml(item)).join('<br>')}`);
+        marker.bindPopup(`<strong>${escapeHtml(location.name)}</strong><br>${location.dates.map(item => formatLocationDateHtml(item)).join('<br>')}`);
         marker.on('click', () => selectLocation(location.key));
         locationMarkers[location.key] = marker;
         bounds.push([location.lat, location.lng]);
@@ -480,22 +497,6 @@ function renderLocationMap() {
         return;
     }
 
-    const mutedClass = key => selectedLocationKey && key !== selectedLocationKey ? ' is-muted' : '';
-    const highlightedClass = key => selectedLocationKey === key ? ' is-highlighted' : '';
-    const cards = locations.map(location => {
-        const driveSummary = formatDriveSummary(location);
-        return `
-        <button class="location-card${mutedClass(location.key)}${highlightedClass(location.key)}" type="button" data-location-key="${escapeHtml(location.key)}">
-            <div class="location-card-title">
-                <span>${escapeHtml(location.name)}${location.home ? ' <span class="location-home-label">HOME</span>' : ''}</span>
-                ${driveSummary ? `<span class="location-drive-summary">${escapeHtml(driveSummary)}</span>` : ''}
-            </div>
-            <div class="location-card-dates">${location.dates.map(item => `<div>${escapeHtml(item)}</div>`).join('')}</div>
-            ${selectedLocationKey === location.key ? '<div class="location-card-note">Selected — driving route shown on map</div>' : ''}
-        </button>
-    `;
-    }).join('');
-
     if (locationMapInstance) {
         clearDrivingRoute();
         locationMapInstance.remove();
@@ -504,15 +505,27 @@ function renderLocationMap() {
     }
     container.innerHTML = `
         <div class="map-panel"><div id="gameLocationMap" role="img" aria-label="Game locations map"></div></div>
-        <div class="location-list" aria-label="Game locations list">${cards}</div>
+        <div class="location-list" aria-label="Game locations list">${renderLocationCards(locations)}</div>
     `;
     renderLeafletMap(locations);
+}
+
+function updateLocationSelection() {
+    const locations = buildGameLocations();
+    const list = document.querySelector('#locationMap .location-list');
+    if (!list || !locationMapInstance) {
+        renderLocationMap();
+        return;
+    }
+    list.innerHTML = renderLocationCards(locations);
+    updateLeafletMarkerStyles(locations);
+    updateSelectedDrivingRoute(locations);
 }
 
 function selectLocation(locationKey = '') {
     selectedLocationKey = selectedLocationKey === locationKey ? '' : locationKey;
     renderCalendar(currentYear, currentMonth);
-    renderLocationMap();
+    updateLocationSelection();
 }
 
 function selectLocationForDate(dateString) {
@@ -520,7 +533,7 @@ function selectLocationForDate(dateString) {
     if (!locationKey) return;
     selectedLocationKey = locationKey;
     renderCalendar(currentYear, currentMonth);
-    renderLocationMap();
+    updateLocationSelection();
 }
 
 function renderEvent(event) {
@@ -623,7 +636,7 @@ function openEventDetails(eventId) {
     if (event.locationKey && selectedLocationKey !== event.locationKey) {
         selectedLocationKey = event.locationKey;
         renderCalendar(currentYear, currentMonth);
-        renderLocationMap();
+        updateLocationSelection();
     }
     body.innerHTML = `
         <dl class="event-details-list">
