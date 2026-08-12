@@ -465,6 +465,34 @@
             transform: scale(1.22);
         }
 
+        .location-marker-row {
+            align-items: center;
+            display: flex;
+            gap: 6px;
+            pointer-events: auto;
+            white-space: nowrap;
+        }
+
+        .location-marker-label {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(148, 163, 184, 0.7);
+            border-radius: 999px;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.2);
+            color: #0f172a;
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1.2;
+            max-width: 175px;
+            overflow: hidden;
+            padding: 4px 8px;
+            text-overflow: ellipsis;
+        }
+
+        .location-marker-row.highlighted .location-marker-label {
+            background: #fffbeb;
+            border-color: #f59e0b;
+        }
+
         .location-list {
             display: grid;
             gap: 8px;
@@ -492,9 +520,24 @@
         }
 
         .location-card-title {
+            align-items: center;
             color: #0f172a;
+            display: flex;
+            flex-wrap: wrap;
             font-weight: 800;
+            gap: 6px;
+            justify-content: space-between;
             margin-bottom: 3px;
+        }
+
+        .location-drive-summary {
+            background: #eef2ff;
+            border: 1px solid #c7d2fe;
+            border-radius: 999px;
+            color: #3730a3;
+            font-size: 11px;
+            font-weight: 900;
+            padding: 2px 7px;
         }
 
         .location-home-label {
@@ -907,7 +950,7 @@ END:VCALENDAR`;
     renderCalendar(currentYear, currentMonth);
 </script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<script src="app.js?v=20260812-real-map-home"></script>
+<script src="app.js?v=20260812-drive-routes-labels"></script>
 
 </body>
 </html>

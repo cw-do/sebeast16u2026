@@ -95,19 +95,22 @@ const TOURNAMENT_DETAILS = {
 
 const GAME_LOCATION_DETAILS = {
     knoxville: { name: 'Knoxville, TN', match: /knoxville|cool sports|ice chalet|kcac|civic coliseum|howard baker|watt rd|lebanon st/i, lat: 35.9606, lng: -83.9207, home: true },
-    pittsburgh: { name: 'Pittsburgh, PA', match: /pittsburgh|valencia|frozen pond/i, lat: 40.4406, lng: -79.9959 },
-    sylvania: { name: 'Sylvania, OH', match: /sylvania|tam-o-shanter|toledo/i, lat: 41.7189, lng: -83.7127 },
-    chicago: { name: 'Chicago, IL', match: /chicago|elk grove|vernon hills|lake forest|rosemont|hoffman estates/i, lat: 41.8781, lng: -87.6298 },
-    troy: { name: 'Troy, MI', match: /troy/i, lat: 42.6064, lng: -83.1498 },
-    detroit: { name: 'Detroit, MI', match: /detroit\b/i, lat: 42.3314, lng: -83.0458 },
-    waterloo: { name: 'Waterloo, ON', match: /waterloo/i, lat: 43.4643, lng: -80.5204 },
-    boston: { name: 'Boston, MA', match: /boston|middleton|tewksbury|new england sports center|essex sports|breakaway ice/i, lat: 42.3601, lng: -71.0589 },
-    raleigh: { name: 'Raleigh, NC', match: /raleigh|wake forest/i, lat: 35.7796, lng: -78.6382 },
-    chesterfield: { name: 'Chesterfield, MO', match: /chesterfield|car shield|maryville/i, lat: 38.6631, lng: -90.5771 }
+    pittsburgh: { name: 'Pittsburgh, PA', match: /pittsburgh|valencia|frozen pond/i, lat: 40.4406, lng: -79.9959, drive: { miles: 491, hours: 9.3 } },
+    sylvania: { name: 'Sylvania, OH', match: /sylvania|tam-o-shanter|toledo/i, lat: 41.7189, lng: -83.7127, drive: { miles: 458, hours: 8.7 } },
+    chicago: { name: 'Chicago, IL', match: /chicago|elk grove|vernon hills|lake forest|rosemont|hoffman estates/i, lat: 41.8781, lng: -87.6298, drive: { miles: 527, hours: 10.2 } },
+    troy: { name: 'Troy, MI', match: /troy/i, lat: 42.6064, lng: -83.1498, drive: { miles: 531, hours: 10.1 } },
+    detroit: { name: 'Detroit, MI', match: /detroit\b/i, lat: 42.3314, lng: -83.0458, drive: { miles: 510, hours: 9.7 } },
+    waterloo: { name: 'Waterloo, ON', match: /waterloo/i, lat: 43.4643, lng: -80.5204, drive: { miles: 692, hours: 13.3 } },
+    boston: { name: 'Boston, MA', match: /boston|middleton|tewksbury|new england sports center|essex sports|breakaway ice/i, lat: 42.3601, lng: -71.0589, drive: { miles: 919, hours: 17.8 } },
+    raleigh: { name: 'Raleigh, NC', match: /raleigh|wake forest/i, lat: 35.7796, lng: -78.6382, drive: { miles: 367, hours: 7.0 } },
+    chesterfield: { name: 'Chesterfield, MO', match: /chesterfield|car shield|maryville/i, lat: 38.6631, lng: -90.5771, drive: { miles: 506, hours: 9.3 } }
 };
 
+const HOME_LOCATION_KEY = 'knoxville';
 let locationMapInstance = null;
 let locationMarkers = {};
+let drivingRouteLayer = null;
+let routeRequestId = 0;
 
 function cleanDescription(value = '') {
     return unescapeIcal(value)
@@ -240,6 +243,20 @@ function summarizeLocationEvents(locationEvents) {
         .map(([date, titles]) => `${formatDateShort(date)} — ${[...new Set(titles)].join(', ')}`);
 }
 
+function summarizeLocationMarkerLabel(location) {
+    if (location.home) return location.name;
+    const dates = [...new Set(location.events.map(event => formatDateShort(event.date)))];
+    const dateLabel = dates.length > 2
+        ? `${dates.slice(0, 2).join(' / ')} +${dates.length - 2}`
+        : dates.join(' / ');
+    return dateLabel ? `${dateLabel} — ${location.name}` : location.name;
+}
+
+function formatDriveSummary(location) {
+    if (!location.drive) return '';
+    return `${location.drive.hours.toFixed(1)} hr · ${location.drive.miles.toLocaleString()} mi`;
+}
+
 function buildGameLocations() {
     const grouped = new Map();
     for (const event of events.filter(entry => entry.locationKey && (entry.isTournament || entry.isWeekendGame))) {
@@ -264,7 +281,12 @@ function buildGameLocations() {
 function markerHtml(location) {
     const highlighted = selectedLocationKey === location.key ? ' highlighted' : '';
     const home = location.home ? ' home' : '';
-    return `<div class="location-marker${home}${highlighted}">${location.home ? 'H' : '•'}</div>`;
+    const label = summarizeLocationMarkerLabel(location);
+    return `
+        <div class="location-marker-row${highlighted ? ' highlighted' : ''}">
+            <div class="location-marker${home}${highlighted}">${location.home ? 'H' : '•'}</div>
+            <div class="location-marker-label">${escapeHtml(label)}</div>
+        </div>`;
 }
 
 function markerIcon(location) {
@@ -272,15 +294,16 @@ function markerIcon(location) {
     return L.divIcon({
         className: `location-marker-wrap${muted}`,
         html: markerHtml(location),
-        iconSize: [28, 28],
-        iconAnchor: [14, 14],
-        popupAnchor: [0, -14]
+        iconSize: [210, 34],
+        iconAnchor: [14, 17],
+        popupAnchor: [0, -17]
     });
 }
 
-function updateLeafletMarkerStyles() {
+function updateLeafletMarkerStyles(locations = []) {
+    const byKey = new Map(locations.map(location => [location.key, location]));
     Object.entries(locationMarkers).forEach(([key, marker]) => {
-        const location = { key, ...GAME_LOCATION_DETAILS[key] };
+        const location = byKey.get(key) || { key, ...GAME_LOCATION_DETAILS[key], events: [] };
         marker.setIcon(markerIcon(location));
     });
 }
@@ -289,6 +312,58 @@ function fitLeafletMap(bounds) {
     if (!locationMapInstance || !bounds.length) return;
     locationMapInstance.invalidateSize();
     locationMapInstance.fitBounds(bounds, { padding: [32, 32], maxZoom: 5 });
+}
+
+function clearDrivingRoute() {
+    if (drivingRouteLayer) {
+        drivingRouteLayer.remove();
+        drivingRouteLayer = null;
+    }
+}
+
+async function drawDrivingRoute(location) {
+    clearDrivingRoute();
+    if (!locationMapInstance || !location || location.home) return;
+    const home = GAME_LOCATION_DETAILS[HOME_LOCATION_KEY];
+    if (!home) return;
+
+    const requestId = ++routeRequestId;
+    const routeUrl =
+        `https://router.project-osrm.org/route/v1/driving/${home.lng},${home.lat};${location.lng},${location.lat}` +
+        '?overview=full&geometries=geojson';
+
+    try {
+        const response = await fetch(routeUrl);
+        if (!response.ok) throw new Error(`Route HTTP ${response.status}`);
+        const data = await response.json();
+        if (requestId !== routeRequestId || !data.routes?.[0]?.geometry) return;
+
+        drivingRouteLayer = L.geoJSON(data.routes[0].geometry, {
+            style: {
+                color: '#f59e0b',
+                opacity: 0.9,
+                weight: 5
+            }
+        }).addTo(locationMapInstance);
+
+        const routeBounds = drivingRouteLayer.getBounds();
+        if (routeBounds.isValid()) {
+            locationMapInstance.fitBounds(routeBounds, { padding: [36, 36], maxZoom: 7 });
+        }
+    } catch (error) {
+        console.warn('Driving route could not be loaded:', error);
+        clearDrivingRoute();
+    }
+}
+
+function updateSelectedDrivingRoute(locations) {
+    const selected = locations.find(location => location.key === selectedLocationKey);
+    if (selected && !selected.home) {
+        drawDrivingRoute(selected);
+    } else {
+        routeRequestId++;
+        clearDrivingRoute();
+    }
 }
 
 function renderLeafletMap(locations) {
@@ -323,9 +398,12 @@ function renderLeafletMap(locations) {
         bounds.push([location.lat, location.lng]);
     }
 
-    updateLeafletMarkerStyles();
+    updateLeafletMarkerStyles(locations);
+    updateSelectedDrivingRoute(locations);
     fitLeafletMap(bounds);
-    setTimeout(() => fitLeafletMap(bounds), 100);
+    setTimeout(() => {
+        if (!selectedLocationKey) fitLeafletMap(bounds);
+    }, 100);
 }
 
 function renderLocationMap() {
@@ -339,15 +417,22 @@ function renderLocationMap() {
 
     const mutedClass = key => selectedLocationKey && key !== selectedLocationKey ? ' is-muted' : '';
     const highlightedClass = key => selectedLocationKey === key ? ' is-highlighted' : '';
-    const cards = locations.map(location => `
+    const cards = locations.map(location => {
+        const driveSummary = formatDriveSummary(location);
+        return `
         <button class="location-card${mutedClass(location.key)}${highlightedClass(location.key)}" type="button" data-location-key="${escapeHtml(location.key)}">
-            <div class="location-card-title">${escapeHtml(location.name)}${location.home ? ' <span class="location-home-label">HOME</span>' : ''}</div>
+            <div class="location-card-title">
+                <span>${escapeHtml(location.name)}${location.home ? ' <span class="location-home-label">HOME</span>' : ''}</span>
+                ${driveSummary ? `<span class="location-drive-summary">${escapeHtml(driveSummary)}</span>` : ''}
+            </div>
             <div class="location-card-dates">${location.dates.map(item => `<div>${escapeHtml(item)}</div>`).join('')}</div>
-            ${selectedLocationKey === location.key ? '<div class="location-card-note">Selected from calendar</div>' : ''}
+            ${selectedLocationKey === location.key ? '<div class="location-card-note">Selected — driving route shown on map</div>' : ''}
         </button>
-    `).join('');
+    `;
+    }).join('');
 
     if (locationMapInstance) {
+        clearDrivingRoute();
         locationMapInstance.remove();
         locationMapInstance = null;
         locationMarkers = {};
