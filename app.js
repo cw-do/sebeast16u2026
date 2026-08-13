@@ -254,7 +254,7 @@ function formatAverageTemp(locationKey, dateString) {
     const high = averages.high?.[monthIndex];
     const low = averages.low?.[monthIndex];
     if (!Number.isFinite(high) || !Number.isFinite(low)) return '';
-    return `${Math.round(high)}F~${Math.round(low)}F avg`;
+    return `${Math.round(low)}F~${Math.round(high)}F avg`;
 }
 
 function formatLocationDateHtml(item) {
