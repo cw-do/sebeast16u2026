@@ -344,6 +344,12 @@ function renderLocationCards(locations) {
     }).join('');
 }
 
+function firstLocationGameDate(location) {
+    return location.events
+        .map(event => event.date)
+        .sort()[0] || '9999-12-31';
+}
+
 function buildGameLocations() {
     const grouped = new Map();
     for (const event of events.filter(entry => entry.locationKey && (entry.isTournament || entry.isWeekendGame))) {
@@ -362,6 +368,10 @@ function buildGameLocations() {
                     ? ['Home base — Knoxville / Cool Sports / Ice Chalet / KCAC']
                     : summarizeLocationEvents(key, locationEvents)
             };
+        })
+        .sort((a, b) => {
+            if (a.home !== b.home) return a.home ? -1 : 1;
+            return firstLocationGameDate(a).localeCompare(firstLocationGameDate(b)) || a.name.localeCompare(b.name);
         });
 }
 
