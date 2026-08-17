@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>16U Hockey Practice Schedule</title>
+    <title>SEBeast 16U Hockey Teamsnap Calender</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIINfQ6fiMJ0ptXnqCO9I0w3++ytddNQcxAc=" crossorigin="">
     <style>
         :root {
@@ -49,7 +49,20 @@
             font-weight: 700;
         }
 
-        .btn-import {
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .btn-import,
+        .btn-pixellot {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
             background-color: var(--accent);
             color: #0f172a;
             border: none;
@@ -61,9 +74,19 @@
             transition: all 0.2s ease;
         }
 
-        .btn-import:hover {
+        .btn-import:hover,
+        .btn-pixellot:hover {
             background-color: #d97706;
             transform: translateY(-1px);
+        }
+
+        .btn-pixellot {
+            background-color: #dbeafe;
+            color: var(--primary);
+        }
+
+        .btn-pixellot:hover {
+            background-color: #bfdbfe;
         }
 
         .nav-bar {
@@ -628,22 +651,6 @@
             margin: 0;
         }
 
-        .sync-btn {
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            background: white;
-            color: var(--primary);
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            padding: 7px 10px;
-        }
-
-        .sync-btn:disabled {
-            cursor: wait;
-            opacity: 0.6;
-        }
-
         @media (max-width: 720px) {
             .location-layout {
                 grid-template-columns: 1fr;
@@ -654,6 +661,16 @@
             .sync-bar {
                 align-items: stretch;
                 flex-direction: column;
+            }
+
+            .header {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 14px;
+            }
+
+            .header-actions {
+                justify-content: flex-start;
             }
 
             .sync-bar .sync-status {
@@ -667,10 +684,13 @@
 <div class="container">
     <div class="header">
         <div>
-            <h1>🏒 16U Hockey Practice Schedule</h1>
+            <h1>🏒 SEBeast 16U Hockey Teamsnap Calender</h1>
             <span style="font-size: 13px; opacity: 0.9;">2026 – 2027 Season Calendar</span>
         </div>
-        <button class="btn-import" onclick="downloadICS()">📅 Export to Google Calendar</button>
+        <div class="header-actions">
+            <a class="btn-pixellot" href="https://you.pixellot.link/PVQS0n87C5b" target="_blank" rel="noopener noreferrer">Team Pixellot</a>
+            <button class="btn-import" onclick="downloadICS()">📅 Export to Google Calendar</button>
+        </div>
     </div>
 
     <div class="nav-bar">
@@ -680,9 +700,6 @@
     </div>
     <div class="sync-bar">
         <span id="syncStatus" class="sync-status">🕒 Loading the latest TeamSnap schedule…</span>
-        <button id="syncButton" class="sync-btn" type="button" onclick="refreshSchedule()">
-            ↻ Refresh
-        </button>
     </div>
 
     <table class="calendar">

@@ -712,9 +712,6 @@ function formatSyncedAt(value) {
 
 async function loadSchedule() {
     const status = document.getElementById('syncStatus');
-    const button = document.getElementById('syncButton');
-    button.disabled = true;
-    button.textContent = 'Refreshing…';
     try {
         const cacheBuster = Date.now();
         const [calendarResponse, metadataResponse] = await Promise.all([
@@ -732,17 +729,9 @@ async function loadSchedule() {
         status.textContent =
             'The latest TeamSnap schedule could not be loaded. Please try again shortly.';
         console.error('Calendar load failed:', error);
-    } finally {
-        button.disabled = false;
-        button.textContent = '↻ Refresh';
     }
     renderCalendar(currentYear, currentMonth);
     renderLocationMap();
-}
-
-function refreshSchedule() {
-    document.getElementById('syncStatus').textContent = 'Checking for the latest synced schedule…';
-    loadSchedule();
 }
 
 loadSchedule();
