@@ -593,6 +593,124 @@
             font-size: 13px;
         }
 
+        .hotel-section {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-top: 18px;
+            padding: 18px;
+        }
+
+        .hotel-section h2 {
+            color: var(--primary);
+            font-size: 20px;
+            margin: 0 0 4px;
+        }
+
+        .hotel-unlock {
+            align-items: center;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            display: flex;
+            gap: 12px;
+            justify-content: space-between;
+            margin: 14px 0;
+            padding: 12px;
+        }
+
+        .hotel-unlock span {
+            color: #64748b;
+            display: block;
+            font-size: 12px;
+        }
+
+        .hotel-code-label {
+            color: #475569;
+            display: grid;
+            font-size: 11px;
+            font-weight: 800;
+            gap: 3px;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .hotel-code-input {
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            font: inherit;
+            min-width: 145px;
+            padding: 8px 10px;
+            text-transform: none;
+        }
+
+        .hotel-table-wrap {
+            overflow-x: auto;
+        }
+
+        .hotel-table {
+            border-collapse: collapse;
+            font-size: 13px;
+            min-width: 860px;
+            width: 100%;
+        }
+
+        .hotel-table th,
+        .hotel-table td {
+            border-bottom: 1px solid var(--border);
+            padding: 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .hotel-table th {
+            background: #eff6ff;
+            color: #1e3a8a;
+            font-size: 11px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .hotel-muted {
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .hotel-note {
+            color: #475569;
+            display: inline-block;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .hotel-status {
+            border-radius: 999px;
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 900;
+            margin-bottom: 5px;
+            padding: 3px 8px;
+            white-space: nowrap;
+        }
+
+        .hotel-status--booked { background: #dcfce7; color: #166534; }
+        .hotel-status--waiting { background: #fef3c7; color: #92400e; }
+        .hotel-status--planning,
+        .hotel-status--unknown { background: #e2e8f0; color: #475569; }
+
+        .hotel-private {
+            color: #0f172a;
+            font-size: 12px;
+            line-height: 1.35;
+        }
+
+        .hotel-locked {
+            color: #64748b;
+            font-size: 12px;
+            font-style: italic;
+        }
+
         .calendar td.has-location-event {
             cursor: pointer;
         }
@@ -654,6 +772,11 @@
         @media (max-width: 720px) {
             .location-layout {
                 grid-template-columns: 1fr;
+            }
+
+            .hotel-unlock {
+                align-items: stretch;
+                flex-direction: column;
             }
         }
 
@@ -737,9 +860,17 @@
 
     <section class="location-section" aria-labelledby="locationMapTitle">
         <h2 id="locationMapTitle">Southeast Beast 16U — 2026–27 game locations</h2>
-        <p class="location-subtitle">Every game and tournament weekend on the schedule, grouped by location. Knoxville home stays first; travel locations are sorted by each city’s first scheduled game date. Click a game date in the calendar to highlight its location.</p>
+        <p class="location-subtitle">Knoxville home stays first. Travel game weekends are ordered by the first scheduled game date; if the same city appears in different weeks, it gets a separate weekend card so hotel planning stays chronological. Click a game date in the calendar to highlight its location.</p>
         <div id="locationMap" class="location-layout">
             <p class="location-empty">Loading game locations…</p>
+        </div>
+    </section>
+
+    <section class="hotel-section" aria-labelledby="hotelTrackerTitle">
+        <h2 id="hotelTrackerTitle">Weekend hotel tracker</h2>
+        <p class="location-subtitle">Hotel planning appears after game and temperature context. Reservation confirmation details are hidden until the family code is entered.</p>
+        <div id="hotelTracker">
+            <p class="location-empty">Loading hotel tracker…</p>
         </div>
     </section>
 </div>
@@ -968,7 +1099,7 @@ END:VCALENDAR`;
     renderCalendar(currentYear, currentMonth);
 </script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<script src="app.js?v=20260817-first-game-date-order"></script>
+<script src="app.js?v=20260823-hotel-tracker"></script>
 
 </body>
 </html>

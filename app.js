@@ -121,11 +121,57 @@ const MONTHLY_AVERAGE_TEMPS = {
     chesterfield: { high: [40, 45, 57, 68, 77, 86, 90, 88, 81, 69, 56, 44], low: [23, 27, 37, 47, 57, 67, 71, 69, 61, 49, 38, 28] }
 };
 
+const HOTEL_PLANS = {
+    '2026-09-05|pittsburgh': {
+        hotel: 'Hilton Garden Inn Pittsburgh/Cranberry',
+        hotelLocation: 'Cranberry Township, PA',
+        status: 'booked',
+        checkIn: 'Friday Sep 4',
+        checkOut: 'Sunday Sep 6',
+        nights: '2 nights',
+        confirmation: '3530580837',
+        note: 'Team mostly booked here; families reserved individually.'
+    },
+    '2026-09-12|sylvania': {
+        hotel: 'Hampton Inn Toledo-South/Maumee',
+        hotelLocation: 'Maumee, OH',
+        status: 'waiting',
+        checkIn: 'TBD',
+        checkOut: 'TBD',
+        nights: 'TBD',
+        confirmation: '',
+        note: 'Team-recommended hotel exists; group booking link has not been shared yet.'
+    },
+    '2026-09-19|chicago': {
+        hotel: 'Embassy Suites by Hilton Chicago North Shore Deerfield',
+        hotelLocation: 'Deerfield, IL',
+        status: 'booked',
+        checkIn: 'Tournament week of Sep 17',
+        checkOut: 'TBD',
+        nights: 'TBD',
+        confirmation: '83315323',
+        emailReceived: 'Aug 17',
+        note: 'Chicago Ice Breaker hotel confirmation received.'
+    },
+    '2026-12-12|waterloo': {
+        hotel: 'Hilton Garden Inn Kitchener/Cambridge',
+        hotelLocation: '746 Old Hespeler Rd, Cambridge, ON, Canada',
+        status: 'booked',
+        checkIn: 'Dec 10',
+        checkOut: 'Sunday Dec 13',
+        nights: '3 nights',
+        confirmation: '2577765',
+        emailReceived: 'Aug 16',
+        note: 'Team manager emailed the hotel link; reservation is complete.'
+    }
+};
+
 const HOME_LOCATION_KEY = 'knoxville';
 let locationMapInstance = null;
 let locationMarkers = {};
 let drivingRouteLayer = null;
 let routeRequestId = 0;
+let hotelPrivateUnlocked = false;
 
 function cleanDescription(value = '') {
     return unescapeIcal(value)
@@ -262,18 +308,140 @@ function formatLocationDateHtml(item) {
 }
 
 function summarizeLocationEvents(locationKey, locationEvents) {
-    const byDate = new Map();
+    return buildTravelWeekends(locationKey, locationEvents).map(weekend => formatWeekendSummary(weekend));
+}
+
+function getWeekStartDate(dateString) {
+    const date = new Date(`${dateString}T00:00:00`);
+    const day = date.getDay();
+    const diffToMonday = (day + 6) % 7;
+    date.setDate(date.getDate() - diffToMonday);
+    return date.toISOString().slice(0, 10);
+}
+
+function buildTravelWeekends(locationKey, locationEvents) {
+    const byWeek = new Map();
     for (const event of locationEvents) {
-        if (!byDate.has(event.date)) byDate.set(event.date, []);
-        byDate.get(event.date).push(event.displayTitle || event.title);
+        const weekStart = getWeekStartDate(event.date);
+        const groupKey = `${weekStart}|${locationKey}`;
+        if (!byWeek.has(groupKey)) byWeek.set(groupKey, { key: groupKey, locationKey, weekStart, events: [] });
+        byWeek.get(groupKey).events.push(event);
     }
-    return Array.from(byDate.entries())
-        .sort(([a], [b]) => a.localeCompare(b))
-        .map(([date, titles]) => {
-            const temp = formatAverageTemp(locationKey, date);
-            const tempLabel = temp ? ` (${temp})` : '';
-            return `${formatDateShort(date)} — ${[...new Set(titles)].join(', ')}${tempLabel}`;
-        });
+    return Array.from(byWeek.values())
+        .map(weekend => {
+            weekend.events.sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
+            weekend.dates = [...new Set(weekend.events.map(event => event.date))];
+            weekend.primaryDate = weekend.dates[0];
+            weekend.endDate = weekend.dates[weekend.dates.length - 1];
+            weekend.title = [...new Set(weekend.events.map(event => event.displayTitle || event.title))].join(', ');
+            weekend.temp = formatAverageTemp(locationKey, weekend.primaryDate);
+            weekend.hotel = HOTEL_PLANS[`${weekend.primaryDate}|${locationKey}`] || HOTEL_PLANS[`${weekend.weekStart}|${locationKey}`] || null;
+            return weekend;
+        })
+        .sort((a, b) => a.primaryDate.localeCompare(b.primaryDate));
+}
+
+function formatWeekendSummary(weekend) {
+    const dateLabel = formatDateRange(weekend.primaryDate, weekend.endDate);
+    const tempLabel = weekend.temp ? ` (${weekend.temp})` : '';
+    const hotelLabel = weekend.hotel?.hotel ? ` · ${weekend.hotel.hotel}` : '';
+    return `${dateLabel} — ${weekend.title}${tempLabel}${hotelLabel}`;
+}
+
+function getAllTravelWeekends() {
+    return buildGameLocations()
+        .filter(location => !location.home)
+        .flatMap(location => buildTravelWeekends(location.key, location.events).map(weekend => ({
+            ...weekend,
+            locationName: location.name,
+            driveSummary: formatDriveSummary(location)
+        })))
+        .sort((a, b) => a.primaryDate.localeCompare(b.primaryDate) || a.locationName.localeCompare(b.locationName));
+}
+
+function hotelStatusLabel(plan) {
+    if (!plan) return { text: 'No hotel note yet', className: 'unknown' };
+    if (plan.status === 'booked') return { text: 'Booked', className: 'booked' };
+    if (plan.status === 'waiting') return { text: 'Waiting for team link', className: 'waiting' };
+    return { text: 'Planning', className: 'planning' };
+}
+
+function renderPrivateHotelCell(plan) {
+    if (!hotelPrivateUnlocked) return '<span class="hotel-locked">Locked — enter code above</span>';
+    if (!plan) return '<span class="hotel-muted">No private reservation detail yet</span>';
+    const bits = [];
+    if (plan.confirmation) bits.push(`Confirmation ${escapeHtml(plan.confirmation)}`);
+    if (plan.emailReceived) bits.push(`Email ${escapeHtml(plan.emailReceived)}`);
+    return bits.join('<br>') || '<span class="hotel-muted">No confirmation yet</span>';
+}
+
+function renderHotelTracker() {
+    const container = document.getElementById('hotelTracker');
+    if (!container) return;
+    const weekends = getAllTravelWeekends().filter(weekend => weekend.hotel || weekend.events.some(event => event.isTournament || event.isWeekendGame));
+    if (!weekends.length) {
+        container.innerHTML = '<p class="location-empty">No travel weekends found yet.</p>';
+        return;
+    }
+    const rows = weekends.map(weekend => {
+        const plan = weekend.hotel;
+        const status = hotelStatusLabel(plan);
+        const visibleStatus = hotelPrivateUnlocked
+            ? status
+            : (plan ? { text: 'Status locked', className: 'planning' } : status);
+        const hotel = plan
+            ? `<b>${escapeHtml(plan.hotel)}</b>${plan.hotelLocation ? `<br><span class="hotel-muted">${escapeHtml(plan.hotelLocation)}</span>` : ''}${plan.note ? `<br><span class="hotel-note">${escapeHtml(plan.note)}</span>` : ''}`
+            : '<span class="hotel-muted">No hotel info added yet</span>';
+        const stay = plan
+            ? `${escapeHtml(plan.checkIn || 'TBD')} → ${escapeHtml(plan.checkOut || 'TBD')}${plan.nights ? `<br><span class="hotel-muted">${escapeHtml(plan.nights)}</span>` : ''}`
+            : '<span class="hotel-muted">TBD</span>';
+        return `
+            <tr>
+                <td>${escapeHtml(formatDateRange(weekend.primaryDate, weekend.endDate))}</td>
+                <td><b>${escapeHtml(weekend.title)}</b><br><span class="hotel-muted">${escapeHtml(weekend.locationName)}${weekend.driveSummary ? ` · ${escapeHtml(weekend.driveSummary)}` : ''}</span></td>
+                <td>${weekend.temp ? `<span class="location-temp">${escapeHtml(weekend.temp)}</span>` : '<span class="hotel-muted">—</span>'}</td>
+                <td>${hotel}</td>
+                <td>${stay}</td>
+                <td><span class="hotel-status hotel-status--${escapeHtml(visibleStatus.className)}">${escapeHtml(visibleStatus.text)}</span><div class="hotel-private">${renderPrivateHotelCell(plan)}</div></td>
+            </tr>`;
+    }).join('');
+    container.innerHTML = `
+        <div class="hotel-unlock" aria-label="Private hotel reservation unlock">
+            <div>
+                <b>Hotel tracker</b>
+                <span>Public view shows travel/hotel planning. Private confirmation details unlock with the family code.</span>
+            </div>
+            <label class="hotel-code-label">Code
+                <input id="hotelCodeInput" class="hotel-code-input" type="password" autocomplete="off" placeholder="family code">
+            </label>
+            <button id="hotelUnlockButton" class="sync-btn" type="button">${hotelPrivateUnlocked ? 'Unlocked' : 'Unlock'}</button>
+        </div>
+        <div class="hotel-table-wrap">
+            <table class="hotel-table">
+                <thead>
+                    <tr>
+                        <th>Weekend</th>
+                        <th>Game / location</th>
+                        <th>Temp</th>
+                        <th>Hotel</th>
+                        <th>Stay</th>
+                        <th>Reservation</th>
+                    </tr>
+                </thead>
+                <tbody>${rows}</tbody>
+            </table>
+        </div>`;
+    const input = document.getElementById('hotelCodeInput');
+    const button = document.getElementById('hotelUnlockButton');
+    if (hotelPrivateUnlocked) input.value = 'jason';
+    const tryUnlock = () => {
+        hotelPrivateUnlocked = input.value.trim().toLowerCase() === 'jason';
+        renderHotelTracker();
+    };
+    button.addEventListener('click', tryUnlock);
+    input.addEventListener('keydown', event => {
+        if (event.key === 'Enter') tryUnlock();
+    });
 }
 
 function formatDateRange(startDateString, endDateString) {
@@ -329,19 +497,35 @@ function formatDriveSummary(location) {
 function renderLocationCards(locations) {
     const mutedClass = key => selectedLocationKey && key !== selectedLocationKey ? ' is-muted' : '';
     const highlightedClass = key => selectedLocationKey === key ? ' is-highlighted' : '';
-    return locations.map(location => {
+    const cards = [];
+
+    for (const location of locations) {
         const driveSummary = formatDriveSummary(location);
-        return `
+        if (location.home) {
+            cards.push(`
         <button class="location-card${mutedClass(location.key)}${highlightedClass(location.key)}" type="button" data-location-key="${escapeHtml(location.key)}">
             <div class="location-card-title">
-                <span>${escapeHtml(location.name)}${location.home ? ' <span class="location-home-label">HOME</span>' : ''}</span>
+                <span>${escapeHtml(location.name)} <span class="location-home-label">HOME</span></span>
+            </div>
+            <div class="location-card-dates"><div>${formatLocationDateHtml(location.dates[0])}</div></div>
+            ${selectedLocationKey === location.key ? '<div class="location-card-note">Selected — home base highlighted on map</div>' : ''}
+        </button>`);
+            continue;
+        }
+
+        for (const weekend of buildTravelWeekends(location.key, location.events)) {
+            cards.push(`
+        <button class="location-card${mutedClass(location.key)}${highlightedClass(location.key)}" type="button" data-location-key="${escapeHtml(location.key)}">
+            <div class="location-card-title">
+                <span>${escapeHtml(formatDateRange(weekend.primaryDate, weekend.endDate))} · ${escapeHtml(location.name)}</span>
                 ${driveSummary ? `<span class="location-drive-summary">${escapeHtml(driveSummary)}</span>` : ''}
             </div>
-            <div class="location-card-dates">${location.dates.map(item => `<div>${formatLocationDateHtml(item)}</div>`).join('')}</div>
+            <div class="location-card-dates"><div>${formatLocationDateHtml(formatWeekendSummary(weekend))}</div></div>
             ${selectedLocationKey === location.key ? '<div class="location-card-note">Selected — driving route shown on map</div>' : ''}
-        </button>
-    `;
-    }).join('');
+        </button>`);
+        }
+    }
+    return cards.join('');
 }
 
 function firstLocationGameDate(location) {
@@ -359,11 +543,12 @@ function buildGameLocations() {
     return Object.entries(GAME_LOCATION_DETAILS)
         .filter(([key, detail]) => detail.home || grouped.has(key))
         .map(([key, detail]) => {
-            const locationEvents = grouped.get(key) || [];
+            const locationEvents = (grouped.get(key) || []).sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
             return {
                 key,
                 ...detail,
                 events: locationEvents,
+                firstDate: locationEvents[0]?.date || '',
                 dates: detail.home
                     ? ['Home base — Knoxville / Cool Sports / Ice Chalet / KCAC']
                     : summarizeLocationEvents(key, locationEvents)
@@ -742,6 +927,7 @@ async function loadSchedule() {
     }
     renderCalendar(currentYear, currentMonth);
     renderLocationMap();
+    renderHotelTracker();
 }
 
 loadSchedule();
