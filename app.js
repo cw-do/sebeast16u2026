@@ -129,7 +129,6 @@ const HOTEL_PLANS = {
         checkIn: 'Friday Sep 4',
         checkOut: 'Sunday Sep 6',
         nights: '2 nights',
-        confirmation: '3530580837',
         note: 'Team mostly booked here; families reserved individually.'
     },
     '2026-09-12|sylvania': {
@@ -139,7 +138,6 @@ const HOTEL_PLANS = {
         checkIn: 'TBD',
         checkOut: 'TBD',
         nights: 'TBD',
-        confirmation: '',
         note: 'Team-recommended hotel exists; group booking link has not been shared yet.'
     },
     '2026-09-19|chicago': {
@@ -149,9 +147,8 @@ const HOTEL_PLANS = {
         checkIn: 'Tournament week of Sep 17',
         checkOut: 'TBD',
         nights: 'TBD',
-        confirmation: '83315323',
         emailReceived: 'Aug 17',
-        note: 'Chicago Ice Breaker hotel confirmation received.'
+        note: 'Chicago Ice Breaker hotel email received.'
     },
     '2026-12-12|waterloo': {
         hotel: 'Hilton Garden Inn Kitchener/Cambridge',
@@ -160,7 +157,6 @@ const HOTEL_PLANS = {
         checkIn: 'Dec 10',
         checkOut: 'Sunday Dec 13',
         nights: '3 nights',
-        confirmation: '2577765',
         emailReceived: 'Aug 16',
         note: 'Team manager emailed the hotel link; reservation is complete.'
     }
@@ -171,7 +167,6 @@ let locationMapInstance = null;
 let locationMarkers = {};
 let drivingRouteLayer = null;
 let routeRequestId = 0;
-let hotelPrivateUnlocked = false;
 
 function cleanDescription(value = '') {
     return unescapeIcal(value)
@@ -366,13 +361,12 @@ function hotelStatusLabel(plan) {
     return { text: 'Planning', className: 'planning' };
 }
 
-function renderPrivateHotelCell(plan) {
-    if (!hotelPrivateUnlocked) return '<span class="hotel-locked">Locked — enter code above</span>';
-    if (!plan) return '<span class="hotel-muted">No private reservation detail yet</span>';
-    const bits = [];
-    if (plan.confirmation) bits.push(`Confirmation ${escapeHtml(plan.confirmation)}`);
-    if (plan.emailReceived) bits.push(`Email ${escapeHtml(plan.emailReceived)}`);
-    return bits.join('<br>') || '<span class="hotel-muted">No confirmation yet</span>';
+function renderHotelReservationCell(plan, status) {
+    if (!plan) return '<span class="hotel-muted">No hotel note yet</span>';
+    const bits = [`<span class="hotel-status hotel-status--${escapeHtml(status.className)}">${escapeHtml(status.text)}</span>`];
+    if (plan.emailReceived) bits.push(`<div class="hotel-private">Email received ${escapeHtml(plan.emailReceived)}</div>`);
+    if (plan.confirmedDate) bits.push(`<div class="hotel-private">${escapeHtml(plan.confirmedDate)}</div>`);
+    return bits.join('');
 }
 
 function renderHotelTracker() {
@@ -386,9 +380,6 @@ function renderHotelTracker() {
     const rows = weekends.map(weekend => {
         const plan = weekend.hotel;
         const status = hotelStatusLabel(plan);
-        const visibleStatus = hotelPrivateUnlocked
-            ? status
-            : (plan ? { text: 'Status locked', className: 'planning' } : status);
         const hotel = plan
             ? `<b>${escapeHtml(plan.hotel)}</b>${plan.hotelLocation ? `<br><span class="hotel-muted">${escapeHtml(plan.hotelLocation)}</span>` : ''}${plan.note ? `<br><span class="hotel-note">${escapeHtml(plan.note)}</span>` : ''}`
             : '<span class="hotel-muted">No hotel info added yet</span>';
@@ -402,19 +393,15 @@ function renderHotelTracker() {
                 <td>${weekend.temp ? `<span class="location-temp">${escapeHtml(weekend.temp)}</span>` : '<span class="hotel-muted">—</span>'}</td>
                 <td>${hotel}</td>
                 <td>${stay}</td>
-                <td><span class="hotel-status hotel-status--${escapeHtml(visibleStatus.className)}">${escapeHtml(visibleStatus.text)}</span><div class="hotel-private">${renderPrivateHotelCell(plan)}</div></td>
+                <td>${renderHotelReservationCell(plan, status)}</td>
             </tr>`;
     }).join('');
     container.innerHTML = `
-        <div class="hotel-unlock" aria-label="Private hotel reservation unlock">
+        <div class="hotel-unlock" aria-label="Hotel reservation summary">
             <div>
                 <b>Hotel tracker</b>
-                <span>Public view shows travel/hotel planning. Private confirmation details unlock with the family code.</span>
+                <span>Shows only booking status and email/confirmed dates; confirmation numbers are not stored or displayed.</span>
             </div>
-            <label class="hotel-code-label">Code
-                <input id="hotelCodeInput" class="hotel-code-input" type="password" autocomplete="off" placeholder="family code">
-            </label>
-            <button id="hotelUnlockButton" class="sync-btn" type="button">${hotelPrivateUnlocked ? 'Unlocked' : 'Unlock'}</button>
         </div>
         <div class="hotel-table-wrap">
             <table class="hotel-table">
@@ -431,17 +418,6 @@ function renderHotelTracker() {
                 <tbody>${rows}</tbody>
             </table>
         </div>`;
-    const input = document.getElementById('hotelCodeInput');
-    const button = document.getElementById('hotelUnlockButton');
-    if (hotelPrivateUnlocked) input.value = 'jason';
-    const tryUnlock = () => {
-        hotelPrivateUnlocked = input.value.trim().toLowerCase() === 'jason';
-        renderHotelTracker();
-    };
-    button.addEventListener('click', tryUnlock);
-    input.addEventListener('keydown', event => {
-        if (event.key === 'Enter') tryUnlock();
-    });
 }
 
 function formatDateRange(startDateString, endDateString) {

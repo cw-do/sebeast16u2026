@@ -626,25 +626,6 @@
             font-size: 12px;
         }
 
-        .hotel-code-label {
-            color: #475569;
-            display: grid;
-            font-size: 11px;
-            font-weight: 800;
-            gap: 3px;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-        }
-
-        .hotel-code-input {
-            border: 1px solid var(--border);
-            border-radius: 7px;
-            font: inherit;
-            min-width: 145px;
-            padding: 8px 10px;
-            text-transform: none;
-        }
-
         .hotel-table-wrap {
             overflow-x: auto;
         }
@@ -703,12 +684,6 @@
             color: #0f172a;
             font-size: 12px;
             line-height: 1.35;
-        }
-
-        .hotel-locked {
-            color: #64748b;
-            font-size: 12px;
-            font-style: italic;
         }
 
         .calendar td.has-location-event {
@@ -868,7 +843,7 @@
 
     <section class="hotel-section" aria-labelledby="hotelTrackerTitle">
         <h2 id="hotelTrackerTitle">Weekend hotel tracker</h2>
-        <p class="location-subtitle">Hotel planning appears after game and temperature context. Reservation confirmation details are hidden until the family code is entered.</p>
+        <p class="location-subtitle">Hotel planning appears after game and temperature context. Confirmation numbers are intentionally not shown; the table only tracks booked / waiting status and email or confirmed dates.</p>
         <div id="hotelTracker">
             <p class="location-empty">Loading hotel tracker…</p>
         </div>
@@ -1099,7 +1074,7 @@ END:VCALENDAR`;
     renderCalendar(currentYear, currentMonth);
 </script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<script src="app.js?v=20260823-hotel-tracker"></script>
+<script src="app.js?v=20260823-hotel-status-no-confirmation"></script>
 
 </body>
 </html>
