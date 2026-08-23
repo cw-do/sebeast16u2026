@@ -357,10 +357,7 @@
         }
 
         .location-layout {
-            align-items: start;
-            display: grid;
-            gap: 16px;
-            grid-template-columns: minmax(0, 1.5fr) minmax(260px, 0.85fr);
+            display: block;
         }
 
         .map-panel {
@@ -593,16 +590,11 @@
             font-size: 13px;
         }
 
-        .hotel-section {
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        .hotel-tracker-panel {
             margin-top: 18px;
-            padding: 18px;
         }
 
-        .hotel-section h2 {
+        .hotel-tracker-panel h2 {
             color: var(--primary);
             font-size: 20px;
             margin: 0 0 4px;
@@ -633,6 +625,42 @@
             font-size: 11px;
             letter-spacing: 0.05em;
             text-transform: uppercase;
+        }
+
+        .hotel-table tbody tr[data-location-key] {
+            cursor: pointer;
+            transition: background 0.16s ease, box-shadow 0.16s ease;
+        }
+
+        .hotel-table tbody tr[data-location-key]:hover,
+        .hotel-table tbody tr[data-location-key]:focus-visible {
+            background: #f8fafc;
+            outline: 2px solid rgba(37, 99, 235, 0.22);
+            outline-offset: -2px;
+        }
+
+        .hotel-table tbody tr.is-highlighted {
+            background: #fffbeb;
+            box-shadow: inset 4px 0 0 #f59e0b;
+        }
+
+        .hotel-route-button {
+            background: #eef2ff;
+            border: 1px solid #c7d2fe;
+            border-radius: 999px;
+            color: #1e3a8a;
+            cursor: pointer;
+            font: inherit;
+            font-size: 12px;
+            font-weight: 900;
+            padding: 4px 9px;
+            white-space: nowrap;
+        }
+
+        .hotel-route-button:hover,
+        .hotel-route-button:focus-visible {
+            background: #dbeafe;
+            outline: 2px solid rgba(37, 99, 235, 0.25);
         }
 
         .hotel-muted {
@@ -812,17 +840,16 @@
 
     <section class="location-section" aria-labelledby="locationMapTitle">
         <h2 id="locationMapTitle">Southeast Beast 16U — 2026–27 game locations</h2>
-        <p class="location-subtitle">Knoxville home stays first. Travel game weekends are ordered by the first scheduled game date; if the same city appears in different weeks, it gets a separate weekend card so hotel planning stays chronological. Click a game date in the calendar to highlight its location.</p>
+        <p class="location-subtitle">Click a hotel tracker row to highlight that city and show the driving route on the map.</p>
         <div id="locationMap" class="location-layout">
             <p class="location-empty">Loading game locations…</p>
         </div>
-    </section>
-
-    <section class="hotel-section" aria-labelledby="hotelTrackerTitle">
-        <h2 id="hotelTrackerTitle">Weekend hotel tracker</h2>
-        <p class="location-subtitle">Hotel planning appears after game and temperature context. Confirmation numbers are intentionally not shown; the table only tracks booked / waiting status and email or confirmed dates.</p>
-        <div id="hotelTracker">
-            <p class="location-empty">Loading hotel tracker…</p>
+        <div class="hotel-tracker-panel" aria-labelledby="hotelTrackerTitle">
+            <h2 id="hotelTrackerTitle">Weekend hotel tracker</h2>
+            <p class="location-subtitle">Hotel planning appears after game and temperature context. Confirmation numbers are intentionally not shown; the table only tracks booked / waiting status and email or confirmed dates.</p>
+            <div id="hotelTracker">
+                <p class="location-empty">Loading hotel tracker…</p>
+            </div>
         </div>
     </section>
 </div>
@@ -1051,7 +1078,7 @@ END:VCALENDAR`;
     renderCalendar(currentYear, currentMonth);
 </script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<script src="app.js?v=20260823-hotel-table-clean-header"></script>
+<script src="app.js?v=20260823-map-driven-hotel-table"></script>
 
 </body>
 </html>

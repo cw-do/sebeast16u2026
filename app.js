@@ -386,9 +386,10 @@ function renderHotelTracker() {
         const stay = plan
             ? `${escapeHtml(plan.checkIn || 'TBD')} → ${escapeHtml(plan.checkOut || 'TBD')}${plan.nights ? `<br><span class="hotel-muted">${escapeHtml(plan.nights)}</span>` : ''}`
             : '<span class="hotel-muted">TBD</span>';
+        const selectedClass = selectedLocationKey === weekend.locationKey ? ' is-highlighted' : '';
         return `
-            <tr>
-                <td>${escapeHtml(formatDateRange(weekend.primaryDate, weekend.endDate))}</td>
+            <tr class="hotel-row${selectedClass}" data-location-key="${escapeHtml(weekend.locationKey)}" title="Click to show ${escapeHtml(weekend.locationName)} route on map">
+                <td><button class="hotel-route-button" type="button" data-location-key="${escapeHtml(weekend.locationKey)}">${escapeHtml(formatDateRange(weekend.primaryDate, weekend.endDate))}</button></td>
                 <td><b>${escapeHtml(weekend.title)}</b><br><span class="hotel-muted">${escapeHtml(weekend.locationName)}${weekend.driveSummary ? ` · ${escapeHtml(weekend.driveSummary)}` : ''}</span></td>
                 <td>${weekend.temp ? `<span class="location-temp">${escapeHtml(weekend.temp)}</span>` : '<span class="hotel-muted">—</span>'}</td>
                 <td>${hotel}</td>
@@ -670,21 +671,20 @@ function renderLocationMap() {
     }
     container.innerHTML = `
         <div class="map-panel"><div id="gameLocationMap" role="img" aria-label="Game locations map"></div></div>
-        <div class="location-list" aria-label="Game locations list">${renderLocationCards(locations)}</div>
     `;
     renderLeafletMap(locations);
 }
 
 function updateLocationSelection() {
     const locations = buildGameLocations();
-    const list = document.querySelector('#locationMap .location-list');
-    if (!list || !locationMapInstance) {
+    if (!locationMapInstance) {
         renderLocationMap();
+        renderHotelTracker();
         return;
     }
-    list.innerHTML = renderLocationCards(locations);
     updateLeafletMarkerStyles(locations);
     updateSelectedDrivingRoute(locations);
+    renderHotelTracker();
 }
 
 function selectLocation(locationKey = '') {
