@@ -608,24 +608,6 @@
             margin: 0 0 4px;
         }
 
-        .hotel-unlock {
-            align-items: center;
-            background: #f8fafc;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            display: flex;
-            gap: 12px;
-            justify-content: space-between;
-            margin: 14px 0;
-            padding: 12px;
-        }
-
-        .hotel-unlock span {
-            color: #64748b;
-            display: block;
-            font-size: 12px;
-        }
-
         .hotel-table-wrap {
             overflow-x: auto;
         }
@@ -747,11 +729,6 @@
         @media (max-width: 720px) {
             .location-layout {
                 grid-template-columns: 1fr;
-            }
-
-            .hotel-unlock {
-                align-items: stretch;
-                flex-direction: column;
             }
         }
 
@@ -1074,7 +1051,7 @@ END:VCALENDAR`;
     renderCalendar(currentYear, currentMonth);
 </script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<script src="app.js?v=20260823-team-booking-link-notes"></script>
+<script src="app.js?v=20260823-hotel-table-clean-header"></script>
 
 </body>
 </html>

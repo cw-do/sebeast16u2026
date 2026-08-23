@@ -397,12 +397,6 @@ function renderHotelTracker() {
             </tr>`;
     }).join('');
     container.innerHTML = `
-        <div class="hotel-unlock" aria-label="Hotel reservation summary">
-            <div>
-                <b>Hotel tracker</b>
-                <span>Shows only booking status and email/confirmed dates; confirmation numbers are not stored or displayed.</span>
-            </div>
-        </div>
         <div class="hotel-table-wrap">
             <table class="hotel-table">
                 <thead>
