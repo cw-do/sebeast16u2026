@@ -148,7 +148,7 @@ const HOTEL_PLANS = {
         checkOut: 'TBD',
         nights: 'TBD',
         emailReceived: 'Aug 17',
-        note: 'Chicago Ice Breaker hotel email received.'
+        note: 'Team booking link was received.'
     },
     '2026-12-12|waterloo': {
         hotel: 'Hilton Garden Inn Kitchener/Cambridge',
@@ -158,7 +158,7 @@ const HOTEL_PLANS = {
         checkOut: 'Sunday Dec 13',
         nights: '3 nights',
         emailReceived: 'Aug 16',
-        note: 'Team manager emailed the hotel link; reservation is complete.'
+        note: 'Team booking link was received by email.'
     }
 };
 
