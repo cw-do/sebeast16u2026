@@ -134,11 +134,11 @@ const HOTEL_PLANS = {
     '2026-09-12|sylvania': {
         hotel: 'Hampton Inn Toledo-South/Maumee',
         hotelLocation: 'Maumee, OH',
-        status: 'waiting',
-        checkIn: 'TBD',
-        checkOut: 'TBD',
-        nights: 'TBD',
-        note: 'Team-recommended hotel exists; group booking link has not been shared yet.'
+        status: 'booked',
+        checkIn: 'Saturday Sep 12',
+        checkOut: 'Sunday Sep 13',
+        nights: '1 night',
+        note: 'TeamSnap hotel booking link was shared.'
     },
     '2026-09-19|chicago': {
         hotel: 'Embassy Suites by Hilton Chicago North Shore Deerfield',
