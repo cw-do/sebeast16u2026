@@ -7,7 +7,7 @@ X-WR-CALNAME:Southeast Beast 16u
 X-WR-CALDESC:The event schedule for the Southeast Beast 16u Ice Hockey team
 X-WR-TIMEZONE:America/New_York
 X-PUBLISHED-TTL:PT1H
-X-TS-TIMESTAMP:2026-09-05 21:58:58
+X-TS-TIMESTAMP:2026-09-06 04:06:31
 BEGIN:VTIMEZONE
 TZID:America/New_York
 BEGIN:DAYLIGHT
@@ -2640,14 +2640,14 @@ SEQUENCE:0
 SUMMARY:Southeast Beast 16u - Training Camp- bonus ice!!!!
 END:VEVENT
 BEGIN:VEVENT
-DTSTAMP:20260811T112105
+DTSTAMP:20260905T183502
 UID:10201455-371506547
 DTSTART;TZID=America/New_York:20260905T170000
 DTEND;TZID=America/New_York:20260905T181500
 DESCRIPTION:Location: Frozen Pond Arena\n 3 Exhibition games on Saturday 9/
  5 and Sunday 9/6 only. -  \n Uniform: White (Arrival Time:  4:00 PM (EDT))
   
-LAST-MODIFIED:20260811T112105
+LAST-MODIFIED:20260905T183502
 LOCATION:118 Sylvan Spring Ln Valencia\, PA\, United States
 SEQUENCE:0
 SUMMARY:Southeast Beast 16u at Pittsburgh Icemen
