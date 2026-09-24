@@ -7,7 +7,7 @@ X-WR-CALNAME:Southeast Beast 16u
 X-WR-CALDESC:The event schedule for the Southeast Beast 16u Ice Hockey team
 X-WR-TIMEZONE:America/New_York
 X-PUBLISHED-TTL:PT1H
-X-TS-TIMESTAMP:2026-09-24 03:33:58
+X-TS-TIMESTAMP:2026-09-24 18:09:09
 BEGIN:VTIMEZONE
 TZID:America/New_York
 BEGIN:DAYLIGHT
@@ -99,21 +99,6 @@ LAST-MODIFIED:20260728T204156
 LOCATION:530 N. Eatherton Rd Chesterfield\, MO 63005
 SEQUENCE:0
 SUMMARY:Southeast Beast 16u at Carshield 16U AAA
-END:VEVENT
-BEGIN:VEVENT
-DTSTAMP:20260605T132528
-UID:10201455-368898167
-DTSTART:20261010T000000
-DTEND:20261011T000000
-DESCRIPTION:This is a weekend exhibition of 3 games.  This is NOT a stay-to
- -play.  The most likely rink will be Wake Competition Center in Raleigh\, 
- NC but times/location is still to be verified.  Games will be Saturday 10/
- 10 and Sunday 10/11 only. -  \n Uniform: White (Arrival Time: 11:00 AM (Ea
- stern Time (US & Canada))) 
-LAST-MODIFIED:20260605T132528
-LOCATION:Raleigh Nc
-SEQUENCE:0
-SUMMARY:Southeast Beast 16u at Jr. Carolina Hurricanes 16u AAA
 END:VEVENT
 BEGIN:VEVENT
 DTSTAMP:20260730T143204
@@ -2640,5 +2625,31 @@ LAST-MODIFIED:20260923T173907
 LOCATION:100 Lebanon St. Knoxville
 SEQUENCE:0
 SUMMARY:Southeast Beast 16u - Practice
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20260924T080932
+UID:10201455-374202664
+DTSTART;TZID=America/New_York:20261010T160000
+DTEND;TZID=America/New_York:20261010T171500
+DESCRIPTION:Location: Polar Ice Rink\n This is a weekend exhibition of 2 ga
+ mes.  This is NOT a stay-to-play. -  \n Uniform: White (Arrival Time:  3:0
+ 0 PM (EDT)) 
+LAST-MODIFIED:20260924T080932
+LOCATION:1410 Buck Jones Rd\, Raleigh\, NC 27606
+SEQUENCE:0
+SUMMARY:Southeast Beast 16u at Jr. Carolina Hurricanes 16u AAA
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20260924T081009
+UID:10201455-374202676
+DTSTART;TZID=America/New_York:20261011T090000
+DTEND;TZID=America/New_York:20261011T101500
+DESCRIPTION:Location: Polar Ice Rink\n This is a weekend exhibition of 2 ga
+ mes.  This is NOT a stay-to-play. -  \n Uniform: White (Arrival Time:  8:0
+ 0 AM (EDT)) 
+LAST-MODIFIED:20260924T081009
+LOCATION:1410 Buck Jones Rd\, Raleigh\, NC 27606
+SEQUENCE:0
+SUMMARY:Southeast Beast 16u at Jr. Carolina Hurricanes 16u AAA
 END:VEVENT
 END:VCALENDAR
