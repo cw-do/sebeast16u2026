@@ -7,7 +7,7 @@ X-WR-CALNAME:Southeast Beast 16u
 X-WR-CALDESC:The event schedule for the Southeast Beast 16u Ice Hockey team
 X-WR-TIMEZONE:America/New_York
 X-PUBLISHED-TTL:PT1H
-X-TS-TIMESTAMP:2026-10-01 14:29:08
+X-TS-TIMESTAMP:2026-10-01 20:45:15
 BEGIN:VTIMEZONE
 TZID:America/New_York
 BEGIN:DAYLIGHT
@@ -2479,18 +2479,18 @@ SEQUENCE:0
 SUMMARY:Southeast Beast 16u at Carshield 16U AAA
 END:VEVENT
 BEGIN:VEVENT
-DTSTAMP:20260728T204258
+DTSTAMP:20261001T133913
 UID:10201455-370704393
 DTSTART;TZID=America/New_York:20261004T104500
 DTEND;TZID=America/New_York:20261004T120000
-DESCRIPTION:Location: Car Shield Sportsplex\n This is a series of 3 exhibit
- ion games.  This is NOT a stay-to-play.  Games will be Saturday 10/3 and S
- unday 10/4 only. -  \n Uniform: White (Arrival Time:  9:45 AM (Eastern Tim
- e (US & Canada))) 
-LAST-MODIFIED:20260728T204258
+DESCRIPTION:Location: Car Shield Sportsplex - Homesafe Rink\n This is a ser
+ ies of 3 exhibition games.  This is NOT a stay-to-play.  Games will be Sat
+ urday 10/3 and Sunday 10/4 only. -  \n Uniform: White (Arrival Time:  9:45
+  AM (EDT)) 
+LAST-MODIFIED:20261001T133913
 LOCATION:530 N. Eatherton Rd Chesterfield\, MO 63005
 SEQUENCE:0
-SUMMARY:Southeast Beast 16u at Carshield 16U AAA
+SUMMARY:Southeast Beast 16u at Chesterfield Falcons
 END:VEVENT
 BEGIN:VEVENT
 DTSTAMP:20260807T175607
