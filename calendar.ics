@@ -7,7 +7,7 @@ X-WR-CALNAME:Southeast Beast 16u
 X-WR-CALDESC:The event schedule for the Southeast Beast 16u Ice Hockey team
 X-WR-TIMEZONE:America/New_York
 X-PUBLISHED-TTL:PT1H
-X-TS-TIMESTAMP:2026-10-03 12:43:00
+X-TS-TIMESTAMP:2026-10-03 18:56:20
 BEGIN:VTIMEZONE
 TZID:America/New_York
 BEGIN:DAYLIGHT
@@ -104,14 +104,14 @@ SEQUENCE:0
 SUMMARY:Southeast Beast 16u at Sylvania North Stars AAA
 END:VEVENT
 BEGIN:VEVENT
-DTSTAMP:20261002T084542
+DTSTAMP:20261003T125856
 UID:10201455-368898078
 DTSTART;TZID=America/Chicago:20261003T101500
 DTEND;TZID=America/Chicago:20261003T113000
 DESCRIPTION:Location: Car Shield Sportsplex\n This is a series of 3 exhibit
  ion games.  This is NOT a stay-to-play.  Games will be Saturday 10/3 and S
  unday 10/4 only. -  \n Uniform: White (Arrival Time:  9:15 AM (CDT)) 
-LAST-MODIFIED:20261002T084542
+LAST-MODIFIED:20261003T125856
 LOCATION:530 N. Eatherton Rd Chesterfield\, MO 63005
 SEQUENCE:0
 SUMMARY:Southeast Beast 16u at Carshield 16U AAA
