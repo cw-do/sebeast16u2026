@@ -7,7 +7,7 @@ X-WR-CALNAME:Southeast Beast 16u
 X-WR-CALDESC:The event schedule for the Southeast Beast 16u Ice Hockey team
 X-WR-TIMEZONE:America/New_York
 X-PUBLISHED-TTL:PT1H
-X-TS-TIMESTAMP:2026-10-11 03:57:16
+X-TS-TIMESTAMP:2026-10-11 14:31:10
 BEGIN:VTIMEZONE
 TZID:America/New_York
 BEGIN:DAYLIGHT
@@ -2612,14 +2612,14 @@ SEQUENCE:0
 SUMMARY:Southeast Beast 16u at Jr. Carolina Hurricanes 16u AAA
 END:VEVENT
 BEGIN:VEVENT
-DTSTAMP:20260924T081009
+DTSTAMP:20261011T102639
 UID:10201455-374202676
 DTSTART;TZID=America/New_York:20261011T090000
 DTEND;TZID=America/New_York:20261011T101500
 DESCRIPTION:Location: Polar Ice Rink\n This is a weekend exhibition of 2 ga
  mes.  This is NOT a stay-to-play. -  \n Uniform: White (Arrival Time:  8:0
  0 AM (EDT)) 
-LAST-MODIFIED:20260924T081009
+LAST-MODIFIED:20261011T102639
 LOCATION:1410 Buck Jones Rd\, Raleigh\, NC 27606
 SEQUENCE:0
 SUMMARY:Southeast Beast 16u at Jr. Carolina Hurricanes 16u AAA
