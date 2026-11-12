@@ -7,7 +7,7 @@ X-WR-CALNAME:Southeast Beast 16u
 X-WR-CALDESC:The event schedule for the Southeast Beast 16u Ice Hockey team
 X-WR-TIMEZONE:America/New_York
 X-PUBLISHED-TTL:PT1H
-X-TS-TIMESTAMP:2026-11-11 21:17:49
+X-TS-TIMESTAMP:2026-11-12 05:25:59
 BEGIN:VTIMEZONE
 TZID:America/New_York
 BEGIN:DAYLIGHT
@@ -115,22 +115,6 @@ LAST-MODIFIED:20261003T125856
 LOCATION:530 N. Eatherton Rd Chesterfield\, MO 63005
 SEQUENCE:0
 SUMMARY:Southeast Beast 16u at Carshield 16U AAA
-END:VEVENT
-BEGIN:VEVENT
-DTSTAMP:20260605T134100
-UID:10201455-368898689
-DTSTART:20261114T000000
-DTEND:20261115T000000
-DESCRIPTION:https://unitedtier1hockeyleague.com/futures-showcase-2/\n\nloca
- tions:\nEssex Sports Center – 15 Manning Ave\, Middleton\, MA 01949\nBre
- akaway Ice Center – 20 Carter St\, Tewksbury\, MA 01876\n\nLast year we 
- were able to pay a fee to opt out of the stay-to-play mandate- we will try
-  to do that again. -   (Arrival Time: 11:00 AM (Eastern Time (US & Canada)
- )) 
-LAST-MODIFIED:20260605T134100
-LOCATION:Boston MA
-SEQUENCE:0
-SUMMARY:Southeast Beast 16u vs TBD
 END:VEVENT
 BEGIN:VEVENT
 DTSTAMP:20260605T134526
@@ -2426,5 +2410,17 @@ LAST-MODIFIED:20261111T161734
 LOCATION:15 Manning Ave. Middleton MA 01949
 SEQUENCE:0
 SUMMARY:Southeast Beast 16u vs Northshore Academy
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261111T161834
+UID:10201455-376345220
+DTSTART;TZID=America/New_York:20261115T114000
+DTEND;TZID=America/New_York:20261115T125500
+DESCRIPTION:Location: Tsongas Center\, U Mass Lowell\n  \n Uniform: White (
+ Arrival Time: 10:40 AM (EST)) 
+LAST-MODIFIED:20261111T161834
+LOCATION:300 Arcand Dr. Lowell\, MA 01852
+SEQUENCE:0
+SUMMARY:Southeast Beast 16u at Westchester Express South 16u
 END:VEVENT
 END:VCALENDAR
