@@ -7,7 +7,7 @@ X-WR-CALNAME:Southeast Beast 16u
 X-WR-CALDESC:The event schedule for the Southeast Beast 16u Ice Hockey team
 X-WR-TIMEZONE:America/New_York
 X-PUBLISHED-TTL:PT1H
-X-TS-TIMESTAMP:2026-11-19 11:54:09
+X-TS-TIMESTAMP:2026-11-19 22:09:40
 BEGIN:VTIMEZONE
 TZID:America/New_York
 BEGIN:DAYLIGHT
@@ -117,19 +117,19 @@ SEQUENCE:0
 SUMMARY:Southeast Beast 16u at Carshield 16U AAA
 END:VEVENT
 BEGIN:VEVENT
-DTSTAMP:20260605T134526
+DTSTAMP:20261119T122739
 UID:10201455-368898798
 DTSTART:20261212T000000
 DTEND:20261213T000000
 DESCRIPTION:https://waterloominorhockey.com/Tournaments/6456/Gold_Puck_AAA_
  Tournament/\n\nArenas: RIM Park - Waterloo Memorial Recreation Complex - A
- lbert McCormick Community Centre\n\nThis is NOT a stay-to-play\n\nPlease m
- ake sure your passports are up to date for this one! -   (Arrival Time: 12
- :00 PM (Eastern Time (US & Canada))) 
-LAST-MODIFIED:20260605T134526
+ lbert McCormick Community Centre\n\nThis is a stay-to-play\n\nPlease make 
+ sure your passports are up to date for this one! -   (Arrival Time: 12:00 
+ AM (EST)) 
+LAST-MODIFIED:20261119T122739
 LOCATION:Waterloo ON
 SEQUENCE:0
-SUMMARY:Southeast Beast 16u vs TBD
+SUMMARY:Southeast Beast 16u at TBD
 END:VEVENT
 BEGIN:VEVENT
 DTSTAMP:20260605T134804
