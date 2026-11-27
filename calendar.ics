@@ -7,7 +7,7 @@ X-WR-CALNAME:Southeast Beast 16u
 X-WR-CALDESC:The event schedule for the Southeast Beast 16u Ice Hockey team
 X-WR-TIMEZONE:America/New_York
 X-PUBLISHED-TTL:PT1H
-X-TS-TIMESTAMP:2026-11-26 12:01:19
+X-TS-TIMESTAMP:2026-11-27 00:33:42
 BEGIN:VTIMEZONE
 TZID:America/New_York
 BEGIN:DAYLIGHT
@@ -132,16 +132,16 @@ SEQUENCE:0
 SUMMARY:Southeast Beast 16u at TBD
 END:VEVENT
 BEGIN:VEVENT
-DTSTAMP:20260605T134804
+DTSTAMP:20261126T134614
 UID:10201455-368898861
 DTSTART:20261219T000000
 DTEND:20261220T000000
 DESCRIPTION:Location: Car Shield Sportsplex\n https://unitedtier1hockeyleag
  ue.com/missouri/\n\nStay to play but we have paid a fee to avoid that in t
  he past.  We will try to do so again.\n\nLocation: Maryville University (&
-  surrounding rinks- in small print)\nDec 18-20 -   (Arrival Time: 12:00 PM
-  (Eastern Time (US & Canada))) 
-LAST-MODIFIED:20260605T134804
+  surrounding rinks- in small print)\nDec 18-20 -   (Arrival Time: 12:00 AM
+  (EST)) 
+LAST-MODIFIED:20261126T134614
 LOCATION:530 N. Eatherton Rd Chesterfield\, MO 63005
 SEQUENCE:0
 SUMMARY:Southeast Beast 16u vs TBD
